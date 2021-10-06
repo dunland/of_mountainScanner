@@ -11,7 +11,7 @@ void ofApp::setup()
     ofSetVerticalSync(true);
 
     img.load("mountain_1920x1080.JPG");
-    img.resize(img.getWidth() / 2, img.getHeight() / 2);
+    img.resize(img.getWidth() / 3, img.getHeight() / 3);
     ofPixels &img_pix = img.getPixels();
 
     colorImg.allocate(img.getWidth(), img.getHeight());
@@ -57,7 +57,7 @@ void ofApp::draw()
     vector<Vec4i> lines;
     Mat mat = toCv(edge_img);
 
-    HoughLinesP(mat, lines, 2, CV_PI / 180, lineThreshold, 15, 20);
+    HoughLinesP(mat, lines, 2, CV_PI / 180, Controls::lineThreshold, 15, 20);
     ofSetColor(255, 0, 0);
     for (int i = 0; i < lines.size(); i++)
     {

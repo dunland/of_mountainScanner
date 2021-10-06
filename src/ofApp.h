@@ -28,14 +28,6 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	// gui:
-	ofxPanel gui;
-    ofxIntSlider edgeThreshold;
-
-    //    Hough Transform Lines
-    ofxIntSlider lineThreshold;
-    ofxIntSlider lowThreshold;
-
 	// images:
 	ofxCvColorImage colorImg;
 	ofxCvGrayscaleImage grayImg;
