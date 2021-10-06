@@ -29,11 +29,10 @@ void ofApp::update()
     Scanner::x_pos = (Scanner::x_pos + 1) % int(img.getWidth());
 
     colorImg.convertToGrayscalePlanarImage(grayImg, 0); // reset grayImg to be updated from scratch in next step
-    int val = 3 + int(mouseX / float(ofGetWindowWidth()) * 212);
-    grayImg.threshold(val);
+    grayImg.threshold(Controls::img_threshold);
 
     // edge detection:
-    Canny(grayImg, edge_img, mouseX, mouseY, 3);
+    Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, 3);
     Sobel(grayImg, sobel_img);
     sobel_img.update();
     edge_img.update();

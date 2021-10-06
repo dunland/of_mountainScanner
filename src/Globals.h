@@ -16,10 +16,16 @@ class Controls
 {
 
 public:
-    // gui:
-    static int edgeThreshold;
 
-    //    Hough Transform Lines
+    // image threshold
+    static int img_threshold;
+
+    // Hough Transform Lines
+    static int edgeThreshold;
     static int lineThreshold;
     static int lowThreshold;
+
+    // Canny Thresholds
+    static int canny_1;
+    static int canny_2;
 };

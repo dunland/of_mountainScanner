@@ -25,8 +25,14 @@ public:
     void gotMessage(ofMessage msg);
 
     ofxPanel gui;
+    ofxIntSlider gui_imgThreshold;
 
+    // hough lines:
     ofxIntSlider gui_edgeThreshold;
     ofxIntSlider gui_lineThreshold;
     ofxIntSlider gui_lowThreshold;
+
+    // Canny Thresholds
+    ofxIntSlider gui_canny_2;
+    ofxIntSlider gui_canny_1;
 };
