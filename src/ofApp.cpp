@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#include "scanner.h"
+#include "Globals.h"
 
 using namespace ofxCv;
 using namespace cv;

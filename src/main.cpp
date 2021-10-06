@@ -1,6 +1,6 @@
 #include "ofMain.h"
 #include "ofApp.h"
-#include "scanner.h"
+#include "Globals.h"
 
 //========================================================================
 int main( ){

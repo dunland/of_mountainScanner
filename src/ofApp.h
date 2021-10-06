@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxOpenCv.h"
-#include "scanner.h"
+#include "Globals.h"
 #include "ofxCv.h"
 #include "ofxGui.h"
 
