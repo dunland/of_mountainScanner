@@ -1,6 +1,5 @@
 #include "ofApp.h"
 #include "scanner.h"
-#include "Globals.h"
 
 using namespace ofxCv;
 using namespace cv;
@@ -31,8 +30,6 @@ void ofApp::update()
 
     colorImg.convertToGrayscalePlanarImage(grayImg, 0); // reset grayImg to be updated from scratch in next step
     int val = 3 + int(mouseX / float(ofGetWindowWidth()) * 212);
-    cout << val << endl;
-    // int val = 120;
     grayImg.threshold(val);
 
     // edge detection:
