@@ -26,8 +26,6 @@ void ofApp::update()
 
     ofPixels &img_pix = img.getPixels();
 
-    Scanner::x_pos = (Scanner::x_pos + 1) % int(img.getWidth());
-
     colorImg.convertToGrayscalePlanarImage(grayImg, 0); // reset grayImg to be updated from scratch in next step
     grayImg.threshold(Controls::img_threshold);
 
@@ -68,6 +66,8 @@ void ofApp::draw()
 
         l.draw();
     }
+
+    Scanner::draw();
 }
 
 //--------------------------------------------------------------

@@ -7,12 +7,6 @@
 #include "ofxOsc.h"
 #include "settings.h"
 
-// send host (aka ip address)
-#define HOST "localhost"
-
-// send port
-#define PORT 9002
-
 class consoleApp : public ofBaseApp
 {
 public:
@@ -47,4 +41,5 @@ public:
     // Communication with Pd
     ofxToggle gui_send_button;
     ofxOscSender sender;
+    ofxOscReceiver receiver;
 };

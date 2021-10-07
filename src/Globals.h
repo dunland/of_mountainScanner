@@ -13,6 +13,8 @@ class Scanner
 
 public:
     static int x_pos;
+
+    static void draw();
 };
 
 class Controls

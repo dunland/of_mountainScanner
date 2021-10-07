@@ -1,6 +1,13 @@
 #include "Globals.h"
+#include "ofMain.h"
 
 int Scanner::x_pos = 0;
+void Scanner::draw()
+{
+    ofSetColor(255);
+    ofRectangle rect_(x_pos, 0, 5, 1080);
+    ofDrawRectangle(rect_);
+}
 
 int Controls::img_threshold;
 

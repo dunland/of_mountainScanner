@@ -14,7 +14,8 @@ void consoleApp::setup()
     gui.add(gui_send_button.setup("send osc data", 0, 15, 15));
 
     // communication with Pd
-    sender.setup(HOST, PORT);
+    sender.setup(HOST, SENDING_PORT);
+    receiver.setup(RECEIVING_PORT);
 }
 
 //--------------------------------------------------------------
@@ -26,7 +27,7 @@ void consoleApp::update()
     Controls::lineThreshold = gui_lineThreshold; // line detection
     Controls::lowThreshold = gui_lowThreshold;   // line detection
 
-    static int prev_thresh = Controls::edgeThreshold; // TODO: send message with every gui update
+    static int prev_thresh = Controls::edgeThreshold;
     if (gui_send_button)
     {
 
@@ -63,6 +64,18 @@ void consoleApp::update()
             }
         }
         gui_send_button = false;
+    }
+
+    if (receiver.hasWaitingMessages())
+    {
+        ofxOscMessage incoming_message;
+        receiver.getNextMessage(incoming_message);
+
+        if (incoming_message.getAddress() == "/scanner/pos")
+        {
+            Scanner::x_pos = incoming_message.getArgAsInt(0);
+            cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
+        }
     }
 }
 
