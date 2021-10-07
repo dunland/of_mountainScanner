@@ -40,6 +40,4 @@ public:
 	Mat imgMatGray;
 	Mat img_edgeMat;
 	Mat img_frameMat;
-
-	int mouse_x;
 };

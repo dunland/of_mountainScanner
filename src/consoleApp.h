@@ -4,6 +4,14 @@
 #include <vector>
 #include <list>
 #include "ofxGui.h"
+#include "ofxOsc.h"
+#include "settings.h"
+
+// send host (aka ip address)
+#define HOST "localhost"
+
+// send port
+#define PORT 9002
 
 class consoleApp : public ofBaseApp
 {
@@ -35,4 +43,7 @@ public:
     // Canny Thresholds
     ofxIntSlider gui_canny_2;
     ofxIntSlider gui_canny_1;
+
+    // Communication with Pd
+    ofxOscSender sender;
 };

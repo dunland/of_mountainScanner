@@ -36,7 +36,6 @@ void ofApp::update()
     Sobel(grayImg, sobel_img);
     sobel_img.update();
     edge_img.update();
-
 }
 
 //--------------------------------------------------------------
@@ -53,17 +52,16 @@ void ofApp::draw()
     edge_img.draw(img.getWidth(), img.getHeight());
 
     // line detection:
-    vector<Vec4i> lines;
     Mat mat = toCv(edge_img);
 
-    HoughLinesP(mat, lines, 2, CV_PI / 180, Controls::lineThreshold, 15, 20);
+    HoughLinesP(mat, Controls::lines, 2, CV_PI / 180, Controls::lineThreshold, 15, 20);
     ofSetColor(255, 0, 0);
-    for (int i = 0; i < lines.size(); i++)
+    for (int i = 0; i < Controls::lines.size(); i++)
     {
-        float x1 = lines[i][0] + img.getWidth();
-        float y1 = lines[i][1] + img.getHeight();
-        float x2 = lines[i][2] + img.getWidth();
-        float y2 = lines[i][3] + img.getHeight();
+        float x1 = Controls::lines[i][0];
+        float y1 = Controls::lines[i][1];
+        float x2 = Controls::lines[i][2];
+        float y2 = Controls::lines[i][3];
         ofPolyline l;
         l.addVertex(x1, y1);
         l.addVertex(x2, y2);

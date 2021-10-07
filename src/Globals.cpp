@@ -12,3 +12,5 @@ int Controls::lowThreshold;
 // Canny Thresholds:
 int Controls::canny_1;
 int Controls::canny_2;
+
+vector<Vec4i> Controls::lines;

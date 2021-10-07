@@ -1,7 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxOpenCv.h"
 #include "ofxGui.h"
+
+using namespace cv;
 
 class Scanner
 {
@@ -28,4 +31,6 @@ public:
     // Canny Thresholds
     static int canny_1;
     static int canny_2;
+
+    static vector<Vec4i> lines; // from ofxOpenCv
 };
