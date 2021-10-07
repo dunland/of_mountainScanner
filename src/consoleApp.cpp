@@ -11,6 +11,7 @@ void consoleApp::setup()
     gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
     gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
     gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
+    gui.add(gui_send_button.setup("send osc data", 0, 15, 15));
 
     // communication with Pd
     sender.setup(HOST, PORT);
@@ -26,7 +27,7 @@ void consoleApp::update()
     Controls::lowThreshold = gui_lowThreshold;   // line detection
 
     static int prev_thresh = Controls::edgeThreshold; // TODO: send message with every gui update
-    if (prev_thresh != Controls::edgeThreshold)
+    if (gui_send_button)
     {
 
         for (int i = 0; i < Controls::lines.size(); i++)
@@ -54,14 +55,14 @@ void consoleApp::update()
                     ofxOscMessage m;
                     m.setAddress("/line/" + ofToString(i));
                     m.addFloatArg(pt.x);
-                    m.addFloatArg(pt.y / IMAGE_HEIGHT);
+                    m.addFloatArg(1 - (pt.y / IMAGE_HEIGHT));
                     sender.sendMessage(m, false);
 
                     ofSleepMillis(1);
                 }
             }
         }
-        prev_thresh = Controls::edgeThreshold;
+        gui_send_button = false;
     }
 }
 

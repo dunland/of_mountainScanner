@@ -45,5 +45,6 @@ public:
     ofxIntSlider gui_canny_1;
 
     // Communication with Pd
+    ofxToggle gui_send_button;
     ofxOscSender sender;
 };

@@ -11,7 +11,7 @@ void ofApp::setup()
     ofSetVerticalSync(true);
 
     img.load("mountain_1920x1080.JPG");
-    img.resize(img.getWidth() / 3, img.getHeight() / 3);
+    // img.resize(img.getWidth() / 3, img.getHeight() / 3);
     ofPixels &img_pix = img.getPixels();
 
     colorImg.allocate(img.getWidth(), img.getHeight());
@@ -47,9 +47,9 @@ void ofApp::draw()
     ofSetColor(255);
 
     img.draw(0, 0);
-    grayImg.draw(0, img.getHeight());
-    sobel_img.draw(img.getWidth(), 0);
-    edge_img.draw(img.getWidth(), img.getHeight());
+    // grayImg.draw(0, img.getHeight());
+    // sobel_img.draw(img.getWidth(), 0);
+    // edge_img.draw(img.getWidth(), img.getHeight());
 
     // line detection:
     Mat mat = toCv(edge_img);
