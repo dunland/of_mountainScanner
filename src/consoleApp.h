@@ -32,11 +32,12 @@ public:
     // hough lines:
     ofxIntSlider gui_edgeThreshold;
     ofxIntSlider gui_lineThreshold;
-    ofxIntSlider gui_lowThreshold;
+    ofxIntSlider gui_minLineLength;
+    ofxIntSlider gui_maxLineGap;
 
     // Canny Thresholds
-    ofxIntSlider gui_canny_2;
     ofxIntSlider gui_canny_1;
+    ofxIntSlider gui_canny_2;
 
     // Communication with Pd
     ofxToggle gui_send_button;

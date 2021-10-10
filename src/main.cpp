@@ -8,11 +8,11 @@ int main( ){
 
 	ofGLWindowSettings settings;
 	settings.setSize(1630, 1080);
-	settings.setPosition(ofVec2f(300, 0));
+	settings.setPosition(ofVec2f(0, 0));
 	auto mainWindow = ofCreateWindow(settings);
 
 	settings.setSize(300, 300);
-	settings.setPosition(ofVec2f(0, 0));
+	settings.setPosition(ofVec2f(1620, 0));
 	auto consoleWindow = ofCreateWindow(settings);
 
 	auto mainApp = make_shared<ofApp>();

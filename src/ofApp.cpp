@@ -30,7 +30,7 @@ void ofApp::update()
     grayImg.threshold(Controls::img_threshold);
 
     // edge detection:
-    Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, 3);
+    Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
     Sobel(grayImg, sobel_img);
     sobel_img.update();
     edge_img.update();
@@ -44,15 +44,29 @@ void ofApp::draw()
     // draw images:
     ofSetColor(255);
 
-    img.draw(0, 0);
-    // grayImg.draw(0, img.getHeight());
-    // sobel_img.draw(img.getWidth(), 0);
-    // edge_img.draw(img.getWidth(), img.getHeight());
+    switch (Controls::draw_mode)
+    {
+    case 1:
+        img.draw(0, 0);
+        break;
+    case 2:
+        grayImg.draw(0, 0);
+        break;
+    case 3:
+        sobel_img.draw(0, 0);
+        break;
+    case 4:
+        edge_img.draw(0, 0);
+        break;
+    default:
+        break;
+    }
 
     // line detection:
     Mat mat = toCv(edge_img);
 
-    HoughLinesP(mat, Controls::lines, 2, CV_PI / 180, Controls::lineThreshold, 15, 20);
+    HoughLinesP(mat, Controls::lines, 120, CV_PI / 180, Controls::lineThreshold, Controls::minLineLength, Controls::maxLineGap);
+
     ofSetColor(255, 0, 0);
     for (int i = 0; i < Controls::lines.size(); i++)
     {

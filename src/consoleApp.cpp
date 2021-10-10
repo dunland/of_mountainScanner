@@ -11,10 +11,20 @@ void consoleApp::setup()
     gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
     gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
     gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
-    gui.add(gui_send_button.setup("send osc data", 0, 15, 15));
+    gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
+    gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
+    gui.add(gui_send_button.setup("send osc data", 8, 0, 15));
 
     // communication with Pd
     sender.setup(HOST, SENDING_PORT);
+    // send 1 to activate udp:
+    ofxOscMessage m;
+    m.setAddress("/setup/");
+    m.addIntArg(1);
+    sender.sendMessage(m, false);
+
+    ofSleepMillis(1);
+
     receiver.setup(RECEIVING_PORT);
 }
 
@@ -23,9 +33,12 @@ void consoleApp::update()
 {
     // update gui variables:
     Controls::img_threshold = gui_imgThreshold;  // img threshold
+    Controls::canny_1 = gui_canny_1;             // img threshold
+    Controls::canny_2 = gui_canny_2;             // img threshold
     Controls::edgeThreshold = gui_edgeThreshold; // line detection
     Controls::lineThreshold = gui_lineThreshold; // line detection
-    Controls::lowThreshold = gui_lowThreshold;   // line detection
+    Controls::minLineLength = gui_minLineLength; // line detection
+    Controls::maxLineGap = gui_maxLineGap;       // line detection
 
     static int prev_thresh = Controls::edgeThreshold;
     if (gui_send_button)
@@ -56,7 +69,8 @@ void consoleApp::update()
                     ofxOscMessage m;
                     m.setAddress("/line/" + ofToString(i));
                     m.addFloatArg(pt.x);
-                    m.addFloatArg(1 - (pt.y / IMAGE_HEIGHT));
+                    if (1 - pt.y / IMAGE_HEIGHT > 0.5)
+                        m.addFloatArg(1 - (pt.y / IMAGE_HEIGHT));
                     sender.sendMessage(m, false);
 
                     ofSleepMillis(1);
@@ -66,17 +80,17 @@ void consoleApp::update()
         gui_send_button = false;
     }
 
-    if (receiver.hasWaitingMessages())
-    {
-        ofxOscMessage incoming_message;
-        receiver.getNextMessage(incoming_message);
+    // if (receiver.hasWaitingMessages())
+    // {
+    ofxOscMessage incoming_message;
+    receiver.getNextMessage(incoming_message);
 
-        if (incoming_message.getAddress() == "/scanner/pos")
-        {
-            Scanner::x_pos = incoming_message.getArgAsInt(0);
-            cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
-        }
+    if (incoming_message.getAddress() == "/scanner/pos")
+    {
+        Scanner::x_pos = incoming_message.getArgAsInt(0);
+        cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
     }
+    // }
 }
 
 //--------------------------------------------------------------
@@ -84,9 +98,19 @@ void consoleApp::draw()
 {
     ofBackground(0);
 
-    // display test:
-    string fpsStr = "test";
-    ofDrawBitmapString(fpsStr, 20, 40);
+    // display parameters:
+    string c3Str = "canny_3 [c]: " + ofToString(Controls::canny_3);
+    ofDrawBitmapString(c3Str, 20, 200);
+
+    string draw_modes[5] = {"", "color", "grey", "sobel", "edge"};
+    string drawStr = "draw_mode [1,2,3,4]: " + draw_modes[Controls::draw_mode];
+    ofDrawBitmapString(drawStr, 20, 220);
+
+    string fpsStr = "fps: " + ofToString(ofGetFrameRate());
+    ofDrawBitmapString(fpsStr, 20, 240);
+
+    string scannerPosStr = "scanner_pos: " + ofToString(Scanner::x_pos);
+    ofDrawBitmapString(scannerPosStr, 20, 260);
 
     gui.draw();
 }
@@ -99,6 +123,36 @@ void consoleApp::keyPressed(int key)
 //--------------------------------------------------------------
 void consoleApp::keyReleased(int key)
 {
+    if (key == '1')
+    {
+        Controls::draw_mode = 1;
+    }
+    else if (key == '2')
+    {
+        Controls::draw_mode = 2;
+    }
+    else if (key == '3')
+    {
+        Controls::draw_mode = 3;
+    }
+    else if (key == '4')
+    {
+        Controls::draw_mode = 4;
+    }
+    else if (key == '0')
+    {
+        Controls::draw_mode = 0;
+    }
+
+    else if (key == 'c')
+    {
+        if (Controls::canny_3 == 3)
+            Controls::canny_3 = 5;
+        else if (Controls::canny_3 == 5)
+            Controls::canny_3 = 7;
+        else if (Controls::canny_3 == 7)
+            Controls::canny_3 = 3;
+    }
 }
 
 //--------------------------------------------------------------

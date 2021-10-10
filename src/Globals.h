@@ -22,6 +22,9 @@ class Controls
 
 public:
 
+    // which image to draw
+    static int draw_mode;
+
     // image threshold
     static int img_threshold;
 
@@ -29,10 +32,14 @@ public:
     static int edgeThreshold;
     static int lineThreshold;
     static int lowThreshold;
+    static int minLineLength;
+    static int maxLineGap;
+    static int rho;
 
     // Canny Thresholds
     static int canny_1;
     static int canny_2;
+    static int canny_3;
 
     static vector<Vec4i> lines; // from ofxOpenCv
 };
