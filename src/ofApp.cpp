@@ -34,6 +34,8 @@ void ofApp::update()
     Sobel(grayImg, sobel_img);
     sobel_img.update();
     edge_img.update();
+
+    Scanner::scan(sobel_img.getPixels());
 }
 
 //--------------------------------------------------------------

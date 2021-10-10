@@ -4,7 +4,6 @@
 #include <vector>
 #include <list>
 #include "ofxGui.h"
-#include "ofxOsc.h"
 #include "settings.h"
 
 class consoleApp : public ofBaseApp
@@ -41,6 +40,4 @@ public:
 
     // Communication with Pd
     ofxToggle gui_send_button;
-    ofxOscSender sender;
-    ofxOscReceiver receiver;
 };

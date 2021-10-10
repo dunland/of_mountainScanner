@@ -13,19 +13,19 @@ void consoleApp::setup()
     gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
     gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
     gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
-    gui.add(gui_send_button.setup("send osc data", 8, 0, 15));
+    gui.add(gui_send_button.setup("scan and send compiled data", 8, 0, 15));
 
     // communication with Pd
-    sender.setup(HOST, SENDING_PORT);
+    Communication::sender.setup(HOST, SENDING_PORT);
     // send 1 to activate udp:
     ofxOscMessage m;
     m.setAddress("/setup/");
     m.addIntArg(1);
-    sender.sendMessage(m, false);
+    Communication::sender.sendMessage(m, false);
 
     ofSleepMillis(1);
 
-    receiver.setup(RECEIVING_PORT);
+    Communication::receiver.setup(RECEIVING_PORT);
 }
 
 //--------------------------------------------------------------
@@ -67,11 +67,12 @@ void consoleApp::update()
 
                     // send data:
                     ofxOscMessage m;
-                    m.setAddress("/line/" + ofToString(i));
+                    m.setAddress("/line");
+                    m.addIntArg(i);
                     m.addFloatArg(pt.x);
                     if (1 - pt.y / IMAGE_HEIGHT > 0.5)
                         m.addFloatArg(1 - (pt.y / IMAGE_HEIGHT));
-                    sender.sendMessage(m, false);
+                    Communication::sender.sendMessage(m, false);
 
                     ofSleepMillis(1);
                 }
@@ -80,17 +81,14 @@ void consoleApp::update()
         gui_send_button = false;
     }
 
-    // if (receiver.hasWaitingMessages())
-    // {
     ofxOscMessage incoming_message;
-    receiver.getNextMessage(incoming_message);
+    Communication::receiver.getNextMessage(incoming_message);
 
     if (incoming_message.getAddress() == "/scanner/pos")
     {
         Scanner::x_pos = incoming_message.getArgAsInt(0);
         cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
     }
-    // }
 }
 
 //--------------------------------------------------------------

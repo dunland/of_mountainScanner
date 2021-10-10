@@ -1,3 +1,4 @@
+#define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
 
 // send host (aka ip address)
