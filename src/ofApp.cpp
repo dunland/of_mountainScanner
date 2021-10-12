@@ -67,23 +67,28 @@ void ofApp::draw()
     // line detection:
     Mat mat = toCv(edge_img);
 
-    HoughLinesP(mat, Controls::lines, 120, CV_PI / 180, Controls::lineThreshold, Controls::minLineLength, Controls::maxLineGap);
-
-    ofSetColor(255, 0, 0);
-    for (int i = 0; i < Controls::lines.size(); i++)
+    if (Controls::do_edgeDetection)
     {
-        float x1 = Controls::lines[i][0];
-        float y1 = Controls::lines[i][1];
-        float x2 = Controls::lines[i][2];
-        float y2 = Controls::lines[i][3];
-        ofPolyline l;
-        l.addVertex(x1, y1);
-        l.addVertex(x2, y2);
+        HoughLinesP(mat, Controls::lines, 120, CV_PI / 180, Controls::lineThreshold, Controls::minLineLength, Controls::maxLineGap);
 
-        l.draw();
+        ofSetColor(255, 0, 0);
+        for (int i = 0; i < Controls::lines.size(); i++)
+        {
+            float x1 = Controls::lines[i][0];
+            float y1 = Controls::lines[i][1];
+            float x2 = Controls::lines[i][2];
+            float y2 = Controls::lines[i][3];
+            ofPolyline l;
+            l.addVertex(x1, y1);
+            l.addVertex(x2, y2);
+
+            l.draw();
+        }
     }
 
     Scanner::draw();
+    if (Scanner::do_draw_limits)
+        Scanner::drawRidgeLimits();
 }
 
 //--------------------------------------------------------------

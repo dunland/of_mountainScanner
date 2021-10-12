@@ -40,4 +40,6 @@ public:
 
     // Communication with Pd
     ofxToggle gui_send_button;
+    ofxIntSlider gui_upperRidgeLimit; // upper limit for white pixel detection
+    ofxIntSlider gui_lowerRidgeLimit; // lower limit for white pixel detection
 };

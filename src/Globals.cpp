@@ -3,6 +3,9 @@
 
 //////////////////////////////// SCANNER //////////////////////////////
 int Scanner::x_pos = 0;
+int Scanner::upperRidgeLimit = 0;
+int Scanner::lowerRidgeLimit = IMAGE_HEIGHT;
+bool Scanner::do_draw_limits = true;
 
 // draw vertical rectangle at scanner position
 void Scanner::draw()
@@ -10,6 +13,14 @@ void Scanner::draw()
     ofSetColor(255);
     ofRectangle rect_(x_pos, 0, 3, 1080);
     ofDrawRectangle(rect_);
+}
+
+// draw horizontal lines as limiters for white pixel detection:
+void Scanner::drawRidgeLimits()
+{
+    ofSetColor(255);
+    ofDrawLine(0, upperRidgeLimit, ofGetWidth(), upperRidgeLimit);
+    ofDrawLine(0, lowerRidgeLimit, ofGetWidth(), lowerRidgeLimit);
 }
 
 // look for white pixels in vertical bar:
@@ -22,7 +33,7 @@ void Scanner::scan(ofPixels &pixels)
     {
         for (int y = 0; y < IMAGE_HEIGHT; y++)
         {
-            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
+            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
             {
                 cout << "white pixel at: (" << x_pos << "|" << y << ")" << endl;
 
@@ -43,10 +54,11 @@ ofxOscSender Communication::sender;
 ofxOscReceiver Communication::receiver;
 
 /////////////////////////////// CONTROLS //////////////////////////////
-int Controls::draw_mode = 1;
+int Controls::draw_mode = 3;
 int Controls::img_threshold;
 
 // Hough Lines
+bool Controls::do_edgeDetection = false;
 int Controls::edgeThreshold;
 int Controls::lineThreshold;
 int Controls::lowThreshold;

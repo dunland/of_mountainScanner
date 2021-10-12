@@ -18,7 +18,12 @@ public:
     static int scanned_pixels[IMAGE_WIDTH][IMAGE_HEIGHT];
     static int x_pos;
 
+    static int upperRidgeLimit; // upper limit for white pixel detection
+    static int lowerRidgeLimit; // lower limit for white pixel detection
+    static bool do_draw_limits;
+
     static void draw();
+    static void drawRidgeLimits();
     static void scan(ofPixels &pixels);
 };
 
@@ -42,6 +47,7 @@ public:
     static int img_threshold;
 
     // Hough Transform Lines
+    static bool do_edgeDetection;
     static int edgeThreshold;
     static int lineThreshold;
     static int lowThreshold;
