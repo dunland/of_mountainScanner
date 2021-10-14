@@ -13,8 +13,9 @@ void consoleApp::setup()
     gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
     gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
     gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
-    gui.add(gui_upperRidgeLimit.setup("upper ridge limit", 0, 0, IMAGE_HEIGHT / 2));
-    gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT, IMAGE_HEIGHT, IMAGE_HEIGHT / 2));
+    gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
+    gui.add(gui_upperRidgeLimit.setup("upper ridge limit", 0, 0, IMAGE_HEIGHT));
+    gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT, IMAGE_HEIGHT, 0));
     gui.add(gui_send_button.setup("scan and send compiled data", 8, 0, 15));
     gui.setPosition(0, 80);
 
@@ -35,15 +36,19 @@ void consoleApp::setup()
 void consoleApp::update()
 {
     // update gui variables:
-    Controls::img_threshold = gui_imgThreshold;     // img threshold
-    Controls::canny_1 = gui_canny_1;                // img threshold
-    Controls::canny_2 = gui_canny_2;                // img threshold
-    Controls::edgeThreshold = gui_edgeThreshold;    // line detection
-    Controls::lineThreshold = gui_lineThreshold;    // line detection
-    Controls::minLineLength = gui_minLineLength;    // line detection
-    Controls::maxLineGap = gui_maxLineGap;          // line detection
-    Scanner::upperRidgeLimit = gui_upperRidgeLimit; // line detection
-    Scanner::lowerRidgeLimit = gui_lowerRidgeLimit; // line detection
+    Controls::img_threshold = gui_imgThreshold;  // img threshold
+    Controls::canny_1 = gui_canny_1;             // img threshold
+    Controls::canny_2 = gui_canny_2;             // img threshold
+    Controls::edgeThreshold = gui_edgeThreshold; // line detection
+    Controls::lineThreshold = gui_lineThreshold; // line detection
+    Controls::minLineLength = gui_minLineLength; // line detection
+    Controls::maxLineGap = gui_maxLineGap;       // line detection
+
+    Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
+    Scanner::upperRidgeLimit = gui_upperRidgeLimit;     // upper scan area
+    // gui_upperRidgeLimit.setMax(gui_lowerRidgeLimit);
+    Scanner::lowerRidgeLimit = gui_lowerRidgeLimit; // lower scan area
+    // gui_lowerRidgeLimit.setMin(gui_upperRidgeLimit);
 
     static int prev_thresh = Controls::edgeThreshold;
     if (gui_send_button)
@@ -159,6 +164,11 @@ void consoleApp::keyReleased(int key)
 
     else if (key == 'l')
         Scanner::do_draw_limits = !Scanner::do_draw_limits;
+
+    else if (key == ' ')
+    {
+        Scanner::scanning = !Scanner::scanning;
+    }
 }
 
 //--------------------------------------------------------------

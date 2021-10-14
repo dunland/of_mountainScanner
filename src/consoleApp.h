@@ -25,11 +25,14 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
+    // TODO: global GUI, keine doppelten Variablen
+
     ofxPanel gui;
     ofxIntSlider gui_imgThreshold;
 
     // hough lines:
     ofxIntSlider gui_edgeThreshold;
+    ofxIntSlider gui_oscillationCenter;
     ofxIntSlider gui_lineThreshold;
     ofxIntSlider gui_minLineLength;
     ofxIntSlider gui_maxLineGap;

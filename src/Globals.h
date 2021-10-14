@@ -15,16 +15,24 @@ class Scanner
     Scanner();
 
 public:
+    static bool scanning;
     static int scanned_pixels[IMAGE_WIDTH][IMAGE_HEIGHT];
     static int x_pos;
+    static int ymin;
+    static int ymax;
 
+    static int oscillationCenter;
     static int upperRidgeLimit; // upper limit for white pixel detection
     static int lowerRidgeLimit; // lower limit for white pixel detection
     static bool do_draw_limits;
 
     static void draw();
     static void drawRidgeLimits();
-    static void scan(ofPixels &pixels);
+    static void getMinMax(ofPixels &pixels);     // performs an initial quick scan of the outline
+    static void scan_absolute(ofPixels &pixels); // looking for white pixels within limits
+    static void scan_relative(ofPixels &pixels); // looking for white pixels within limits and convert relative to oscillationCenter
+
+    static vector<int> white_pixels;
 };
 
 //////////////////////////// COMMUNICATION ////////////////////////////

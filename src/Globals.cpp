@@ -2,7 +2,12 @@
 #include "ofMain.h"
 
 //////////////////////////////// SCANNER //////////////////////////////
+bool Scanner::scanning = false;
 int Scanner::x_pos = 0;
+int Scanner::ymin = IMAGE_HEIGHT;
+int Scanner::ymax = 0;
+
+int Scanner::oscillationCenter = IMAGE_HEIGHT / 2;
 int Scanner::upperRidgeLimit = 0;
 int Scanner::lowerRidgeLimit = IMAGE_HEIGHT;
 bool Scanner::do_draw_limits = true;
@@ -21,10 +26,32 @@ void Scanner::drawRidgeLimits()
     ofSetColor(255);
     ofDrawLine(0, upperRidgeLimit, ofGetWidth(), upperRidgeLimit);
     ofDrawLine(0, lowerRidgeLimit, ofGetWidth(), lowerRidgeLimit);
+    ofDrawLine(0, oscillationCenter, ofGetWidth(), oscillationCenter);
 }
 
-// look for white pixels in vertical bar:
-void Scanner::scan(ofPixels &pixels)
+// perform an initial quick scan of the outline
+void Scanner::getMinMax(ofPixels &pixels)
+{
+    ymin = IMAGE_HEIGHT;
+    ymax = 0;
+    // get ymin and ymax for each x:
+    for (int x = 0; x < IMAGE_WIDTH; x++)
+    {
+        for (int y = 0; y < IMAGE_HEIGHT; y++)
+        {
+            if (pixels.getColor(x, y) == ofColor(255, 255, 255) && y >= upperRidgeLimit && y <= lowerRidgeLimit)
+            {
+                if (y < ymin)
+                    ymin = y;
+                if (y > ymax)
+                    ymax = y;
+            }
+        }
+    }
+}
+
+// look for white pixels within limits in vertical bar:
+void Scanner::scan_absolute(ofPixels &pixels)
 {
     x_pos = (x_pos + 1) % IMAGE_WIDTH;
 
@@ -35,13 +62,51 @@ void Scanner::scan(ofPixels &pixels)
         {
             if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
             {
-                cout << "white pixel at: (" << x_pos << "|" << y << ")" << endl;
+                float y_out = 1 - (y / 1080.0);
+                cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
                 // send data:
                 ofxOscMessage m;
                 m.setAddress("/rt_scan");
                 m.addFloatArg(x_pos);
-                m.addFloatArg(y);
+                m.addFloatArg(y_out);
+                Communication::sender.sendMessage(m, false);
+            }
+        }
+        previous_x_pos = x_pos;
+    }
+}
+
+// converts white pixels within limits relative to oscillationCenter
+void Scanner::scan_relative(ofPixels &pixels)
+{
+    x_pos = (x_pos + 1) % IMAGE_WIDTH;
+
+    static int previous_x_pos = 0;
+    if (x_pos != previous_x_pos)
+    {
+        for (int y = 0; y < IMAGE_HEIGHT; y++)
+        {
+            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
+            {
+                float y_out;
+
+                if (y < Scanner::oscillationCenter) // positive values above oscLine
+                {
+                    y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
+                }
+                else if (y > Scanner::oscillationCenter) // negative values below oscLine
+                {
+                    y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
+                }
+
+                cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+
+                // send data:
+                ofxOscMessage m;
+                m.setAddress("/rt_scan");
+                m.addFloatArg(x_pos);
+                m.addFloatArg(y_out);
                 Communication::sender.sendMessage(m, false);
             }
         }
@@ -54,7 +119,7 @@ ofxOscSender Communication::sender;
 ofxOscReceiver Communication::receiver;
 
 /////////////////////////////// CONTROLS //////////////////////////////
-int Controls::draw_mode = 3;
+int Controls::draw_mode = 4;
 int Controls::img_threshold;
 
 // Hough Lines

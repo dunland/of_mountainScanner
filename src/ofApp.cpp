@@ -35,7 +35,29 @@ void ofApp::update()
     sobel_img.update();
     edge_img.update();
 
-    Scanner::scan(edge_img.getPixels());
+    // --- update min/max Scanner values if limits change -----
+    static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+    if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
+    {
+        Scanner::getMinMax(edge_img.getPixels());
+        prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+        cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
+    }
+
+    static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
+    if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
+    {
+        Scanner::getMinMax(edge_img.getPixels());
+        prev_highRidgeLimit = Scanner::upperRidgeLimit;
+        cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
+    }
+
+    // ------------ perform the scanning -----------------------
+    if (Scanner::scanning)
+    {
+        // Scanner::scan_absolute(edge_img.getPixels());
+        Scanner::scan_relative(edge_img.getPixels());
+    }
 }
 
 //--------------------------------------------------------------
