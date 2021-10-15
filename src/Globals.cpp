@@ -3,6 +3,8 @@
 
 //////////////////////////////// SCANNER //////////////////////////////
 bool Scanner::scanning = false;
+Scan_Mode Scanner::scan_mode = Absolute;
+
 int Scanner::x_pos = 0;
 int Scanner::ymin = IMAGE_HEIGHT;
 int Scanner::ymax = 0;

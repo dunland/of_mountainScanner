@@ -55,8 +55,18 @@ void ofApp::update()
     // ------------ perform the scanning -----------------------
     if (Scanner::scanning)
     {
-        // Scanner::scan_absolute(edge_img.getPixels());
-        Scanner::scan_relative(edge_img.getPixels());
+        switch (Scanner::scan_mode)
+        {
+        case Absolute:
+            Scanner::scan_absolute(edge_img.getPixels());
+            break;
+        case Relative:
+            Scanner::scan_relative(edge_img.getPixels());
+            break;
+
+        default:
+            break;
+        }
     }
 }
 

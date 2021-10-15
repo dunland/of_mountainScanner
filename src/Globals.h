@@ -8,6 +8,12 @@
 
 using namespace cv;
 
+enum Scan_Mode
+{
+    Absolute = 0,
+    Relative = 1
+};
+
 //////////////////////////////// SCANNER //////////////////////////////
 class Scanner
 {
@@ -15,6 +21,7 @@ class Scanner
     Scanner();
 
 public:
+    static Scan_Mode scan_mode;
     static bool scanning;
     static int scanned_pixels[IMAGE_WIDTH][IMAGE_HEIGHT];
     static int x_pos;
