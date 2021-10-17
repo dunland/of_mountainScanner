@@ -29,6 +29,8 @@ public:
 	void gotMessage(ofMessage msg);
 
 	// images:
+	string images[3] = {"mountain_1920x1080.JPG", "02.JPG", "03.JPG"};
+	int img_idx = 0;
 	ofxCvColorImage colorImg;
 	ofxCvGrayscaleImage grayImg;
 

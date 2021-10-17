@@ -7,16 +7,16 @@ using namespace cv;
 //--------------------------------------------------------------
 void ofApp::setup()
 {
+    ofSetWindowTitle("ofApp");
 
     ofSetVerticalSync(true);
 
-    img.load("mountain_1920x1080.JPG");
-    // img.resize(img.getWidth() / 3, img.getHeight() / 3);
-    ofPixels &img_pix = img.getPixels();
+    img.load(images[img_idx]);
+    img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     colorImg.allocate(img.getWidth(), img.getHeight());
     grayImg.allocate(img.getWidth(), img.getHeight());
-    colorImg.setFromPixels(img_pix);
+    colorImg.setFromPixels(img.getPixels());
     colorImg.convertToGrayscalePlanarImage(grayImg, 0);
 }
 
@@ -36,6 +36,7 @@ void ofApp::update()
     edge_img.update();
 
     // --- update min/max Scanner values if limits change -----
+    // TODO: make gui global and use gui_lowerRidgeSlider.mouseReleased()
     static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
     if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
     {
@@ -67,6 +68,30 @@ void ofApp::update()
         default:
             break;
         }
+    }
+
+    if (Scanner::scan_iteration >= Scanner::maxIterations)
+    {
+        img_idx = (img_idx + 1) % 3;
+
+        // images setup:
+        img.load(images[img_idx]);
+        img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+        colorImg.allocate(img.getWidth(), img.getHeight());
+        grayImg.allocate(img.getWidth(), img.getHeight());
+        colorImg.setFromPixels(img.getPixels());
+        colorImg.convertToGrayscalePlanarImage(grayImg, 0);
+
+        // edge detection:
+        Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+        Sobel(grayImg, sobel_img);
+        sobel_img.update();
+        edge_img.update();
+
+        Scanner::getMinMax(edge_img.getPixels());
+
+        Scanner::scan_iteration = 0;
+        cout << "loading image " + images[img_idx] << endl;
     }
 }
 
@@ -134,6 +159,44 @@ void ofApp::keyReleased(int key)
     if (key == 'f')
     {
         ofToggleFullscreen();
+    }
+    else if (key == '1')
+    {
+        Controls::draw_mode = 1;
+    }
+    else if (key == '2')
+    {
+        Controls::draw_mode = 2;
+    }
+    else if (key == '3')
+    {
+        Controls::draw_mode = 3;
+    }
+    else if (key == '4')
+    {
+        Controls::draw_mode = 4;
+    }
+    else if (key == '0')
+    {
+        Controls::draw_mode = 0;
+    }
+
+    else if (key == 'c')
+    {
+        if (Controls::canny_3 == 3)
+            Controls::canny_3 = 5;
+        else if (Controls::canny_3 == 5)
+            Controls::canny_3 = 7;
+        else if (Controls::canny_3 == 7)
+            Controls::canny_3 = 3;
+    }
+
+    else if (key == 'l')
+        Scanner::do_draw_limits = !Scanner::do_draw_limits;
+
+    else if (key == ' ')
+    {
+        Scanner::scanning = !Scanner::scanning;
     }
 }
 

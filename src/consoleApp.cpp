@@ -5,6 +5,8 @@
 //--------------------------------------------------------------
 void consoleApp::setup()
 {
+    ofSetWindowTitle("consoleApp");
+
     gui.setup();
     gui.add(gui_imgThreshold.setup("Image Threshold", 113, 0, 255));
     gui.add(gui_canny_1.setup("Canny Threshold 1", 0, 0, 255));
@@ -14,8 +16,8 @@ void consoleApp::setup()
     gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
     gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
     gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
-    gui.add(gui_upperRidgeLimit.setup("upper ridge limit", 0, 0, IMAGE_HEIGHT));
-    gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT, IMAGE_HEIGHT, 0));
+    gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
+    gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
     gui.add(gui_scanModeButton.setup("set scan mode", 8, 0, 15));
     // gui.add(gui_send_button.setup("scan and send compiled data", 8, 0, 15));
     gui.setPosition(0, 120);

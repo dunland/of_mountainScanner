@@ -2,8 +2,10 @@
 #include "ofMain.h"
 
 //////////////////////////////// SCANNER //////////////////////////////
-bool Scanner::scanning = false;
 Scan_Mode Scanner::scan_mode = Absolute;
+bool Scanner::scanning = false;
+int Scanner::scan_iteration = 0;
+int Scanner::maxIterations = 2;
 
 int Scanner::x_pos = 0;
 int Scanner::ymin = IMAGE_HEIGHT;
@@ -15,17 +17,29 @@ int Scanner::lowerRidgeLimit = IMAGE_HEIGHT;
 bool Scanner::do_draw_limits = true;
 
 // draw vertical rectangle at scanner position
+// TODO: inverted color bar of original image; using shader?
 void Scanner::draw()
 {
-    ofSetColor(255);
-    ofRectangle rect_(x_pos, 0, 3, 1080);
-    ofDrawRectangle(rect_);
+    ofSetColor(250);
+    switch (Scanner::scan_mode)
+    {
+    case Absolute:
+        ofDrawRectangle(ofRectangle(x_pos, 0, 3, 1080));
+        break;
+
+    case Relative:
+        ofDrawRectangle(ofRectangle(x_pos, upperRidgeLimit, 3, lowerRidgeLimit - upperRidgeLimit));
+        break;
+
+    default:
+        break;
+    }
 }
 
 // draw horizontal lines as limiters for white pixel detection:
 void Scanner::drawRidgeLimits()
 {
-    ofSetColor(255);
+    ofSetColor(250);
     ofDrawLine(0, upperRidgeLimit, ofGetWidth(), upperRidgeLimit);
     ofDrawLine(0, lowerRidgeLimit, ofGetWidth(), lowerRidgeLimit);
     ofDrawLine(0, oscillationCenter, ofGetWidth(), oscillationCenter);
@@ -41,12 +55,30 @@ void Scanner::getMinMax(ofPixels &pixels)
     {
         for (int y = 0; y < IMAGE_HEIGHT; y++)
         {
-            if (pixels.getColor(x, y) == ofColor(255, 255, 255) && y >= upperRidgeLimit && y <= lowerRidgeLimit)
+            if (pixels.getColor(x, y) == ofColor(255, 255, 255))
             {
-                if (y < ymin)
-                    ymin = y;
-                if (y > ymax)
-                    ymax = y;
+                switch (Scanner::scan_mode)
+                {
+                case Relative:
+                    if (y >= upperRidgeLimit && y <= lowerRidgeLimit)
+                    {
+                        if (y < ymin)
+                            ymin = y;
+                        if (y > ymax)
+                            ymax = y;
+                    }
+                    break;
+
+                case Absolute:
+                    if (y < ymin)
+                        ymin = y;
+                    if (y > ymax)
+                        ymax = y;
+                    break;
+
+                default:
+                    break;
+                }
             }
         }
     }
@@ -65,7 +97,7 @@ void Scanner::scan_absolute(ofPixels &pixels)
             if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
             {
                 float y_out = 1 - (y / 1080.0);
-                cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+                // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
                 // send data:
                 ofxOscMessage m;
@@ -75,6 +107,13 @@ void Scanner::scan_absolute(ofPixels &pixels)
                 Communication::sender.sendMessage(m, false);
             }
         }
+
+        if (x_pos >= IMAGE_WIDTH - 1)
+        {
+            scan_iteration++;
+            cout << "reached end of image. scan_iteration ++" << endl;
+        }
+
         previous_x_pos = x_pos;
     }
 }
@@ -102,7 +141,7 @@ void Scanner::scan_relative(ofPixels &pixels)
                     y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
                 }
 
-                cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+                // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
                 // send data:
                 ofxOscMessage m;
@@ -112,6 +151,13 @@ void Scanner::scan_relative(ofPixels &pixels)
                 Communication::sender.sendMessage(m, false);
             }
         }
+
+        if (x_pos >= IMAGE_WIDTH - 1)
+        {
+            scan_iteration++;
+            cout << "reached end of image. scan_iteration ++" << endl;
+        }
+
         previous_x_pos = x_pos;
     }
 }

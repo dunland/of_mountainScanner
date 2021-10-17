@@ -23,7 +23,9 @@ class Scanner
 public:
     static Scan_Mode scan_mode;
     static bool scanning;
-    static int scanned_pixels[IMAGE_WIDTH][IMAGE_HEIGHT];
+    static int scan_iteration;
+    static int maxIterations;
+
     static int x_pos;
     static int ymin;
     static int ymax;
@@ -38,8 +40,6 @@ public:
     static void getMinMax(ofPixels &pixels);     // performs an initial quick scan of the outline
     static void scan_absolute(ofPixels &pixels); // looking for white pixels within limits
     static void scan_relative(ofPixels &pixels); // looking for white pixels within limits and convert relative to oscillationCenter
-
-    static vector<int> white_pixels;
 };
 
 //////////////////////////// COMMUNICATION ////////////////////////////

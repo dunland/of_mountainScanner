@@ -11,7 +11,7 @@ int main( ){
 	settings.setPosition(ofVec2f(0, 0));
 	auto mainWindow = ofCreateWindow(settings);
 
-	settings.setSize(300, 500);
+	settings.setSize(300, 400);
 	settings.setPosition(ofVec2f(1620, 0));
 	auto consoleWindow = ofCreateWindow(settings);
 
