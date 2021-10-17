@@ -9,14 +9,14 @@ void consoleApp::setup()
 
     gui.setup();
     gui.add(gui_imgThreshold.setup("Image Threshold", 113, 0, 255));
-    gui.add(gui_canny_1.setup("Canny Threshold 1", 0, 0, 255));
-    gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
-    gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
-    gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
-    gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
-    gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
-    gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
+    // gui.add(gui_canny_1.setup("Canny Threshold 1", 0, 0, 255));
+    // gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
+    // gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
+    // gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
+    // gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
+    // gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
     gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
+    gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
     gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
     gui.add(gui_scanModeButton.setup("set scan mode", 8, 0, 15));
     gui.add(gui_send_button.setup("quickScan and send compiled data", 8, 0, 15));
@@ -57,7 +57,7 @@ void consoleApp::update()
         gui_send_button = false;
     }
 
-    Scanner::scan_mode = (gui_scanModeButton) ? Absolute : Relative;
+    Scanner::scan_mode = (gui_scanModeButton) ? Relative : Absolute;
 
     ofxOscMessage incoming_message;
     Communication::receiver.getNextMessage(incoming_message);
@@ -147,6 +147,11 @@ void consoleApp::keyReleased(int key)
     else if (key == ' ')
     {
         Scanner::scanning = !Scanner::scanning;
+    }
+
+    else if (key == OF_KEY_RETURN)
+    {
+        Controls::loadNextImage();
     }
 }
 

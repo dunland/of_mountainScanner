@@ -2,11 +2,13 @@
 
 #include "ofMain.h"
 #include "ofxOpenCv.h"
+#include "ofxCv.h"
 #include "ofxGui.h"
 #include "settings.h"
 #include "ofxOsc.h"
 
 using namespace cv;
+using namespace ofxCv;
 
 enum Scan_Mode
 {
@@ -77,6 +79,7 @@ public:
 
     // Hough Transform Lines
     static bool do_edgeDetection;
+    static bool doQuickScanNextUpdate;
     static int edgeThreshold;
     static int lineThreshold;
     static int lowThreshold;
@@ -90,4 +93,6 @@ public:
     static int canny_3;
 
     static vector<Vec4i> lines; // from ofxOpenCv
+
+    static void loadNextImage();
 };

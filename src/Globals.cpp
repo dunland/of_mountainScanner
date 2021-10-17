@@ -3,14 +3,14 @@
 
 //////////////////////////////// GLOBALS //////////////////////////////
 
-    // images:
-    string Globals::images[3] = {"mountain_1920x1080.JPG", "02.JPG", "03.JPG"};
-    int Globals::img_idx = 0;
-    ofxCvColorImage Globals::colorImg;
-    ofxCvGrayscaleImage Globals::grayImg;
+// images:
+string Globals::images[3] = {"mountain_1920x1080.JPG", "02.JPG", "03.JPG"};
+int Globals::img_idx = 0;
+ofxCvColorImage Globals::colorImg;
+ofxCvGrayscaleImage Globals::grayImg;
 
-    // edge detection:
-    ofImage Globals::img, Globals::gray_img, Globals::edge_img, Globals::sobel_img;
+// edge detection:
+ofImage Globals::img, Globals::gray_img, Globals::edge_img, Globals::sobel_img;
 
 //////////////////////////////// SCANNER //////////////////////////////
 Scan_Mode Scanner::scan_mode = Relative;
@@ -105,7 +105,7 @@ void Scanner::scan_absolute(ofPixels &pixels)
     {
         for (int y = 0; y < IMAGE_HEIGHT; y++)
         {
-            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
+            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
             {
                 float y_out = 1 - (y / 1080.0);
                 // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
@@ -119,11 +119,11 @@ void Scanner::scan_absolute(ofPixels &pixels)
             }
         }
 
-        if (x_pos >= IMAGE_WIDTH - 1)
-        {
-            scan_iteration++;
-            cout << "reached end of image. scan_iteration ++" << endl;
-        }
+        // if (x_pos >= IMAGE_WIDTH - 1)
+        // {
+        //     scan_iteration++;
+        //     cout << "reached end of image. scan_iteration ++" << endl;
+        // }
 
         previous_x_pos = x_pos;
     }
@@ -163,11 +163,11 @@ void Scanner::scan_relative(ofPixels &pixels)
             }
         }
 
-        if (x_pos >= IMAGE_WIDTH - 1)
-        {
-            scan_iteration++;
-            cout << "reached end of image. scan_iteration ++" << endl;
-        }
+        // if (x_pos >= IMAGE_WIDTH - 1)
+        // {
+        //     scan_iteration++;
+        //     cout << "reached end of image. scan_iteration ++" << endl;
+        // }
 
         previous_x_pos = x_pos;
     }
@@ -178,13 +178,15 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     ofxOscMessage m;
     m.setAddress("/quickScan");
 
+    getMinMax(pixels);
+
     for (int x = 0; x < IMAGE_WIDTH; x++)
     {
+        float y_out = 0;
         for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x, y) == ofColor(255, 255, 255))
             {
-                float y_out;
 
                 if (y < Scanner::oscillationCenter) // positive values above oscLine
                 {
@@ -202,7 +204,6 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     }
 
     // send data:
-    cout << m << endl;
     Communication::sender.sendMessage(m, false);
 }
 
@@ -216,6 +217,7 @@ int Controls::img_threshold;
 
 // Hough Lines
 bool Controls::do_edgeDetection = false;
+bool Controls::doQuickScanNextUpdate = false;
 int Controls::edgeThreshold;
 int Controls::lineThreshold;
 int Controls::lowThreshold;
@@ -228,3 +230,26 @@ int Controls::canny_2;
 int Controls::canny_3 = 3;
 
 vector<Vec4i> Controls::lines;
+
+void Controls::loadNextImage()
+{
+    // images setup:
+    Globals::img_idx = (Globals::img_idx + 1) % 3;
+
+    Globals::img.load(Globals::images[Globals::img_idx]);
+    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::colorImg.setFromPixels(Globals::img.getPixels());
+    Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
+    Globals::grayImg.threshold(Controls::img_threshold);
+
+    // edge detection:
+    Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+    Sobel(Globals::grayImg, Globals::sobel_img);
+    Globals::sobel_img.update();
+    Globals::edge_img.update();
+    cout << "loading image " + Globals::images[Globals::img_idx] << endl;
+    Scanner::scan_iteration = 0;
+    Controls::doQuickScanNextUpdate = true;
+}

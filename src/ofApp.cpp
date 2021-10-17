@@ -79,29 +79,35 @@ void ofApp::update()
         }
     }
 
-    if (Scanner::scan_iteration >= Scanner::maxIterations)
+    if (Controls::doQuickScanNextUpdate)
     {
-        Globals::img_idx = (Globals::img_idx + 1) % 3;
-
-        // images setup:
-        Globals::img.load(Globals::images[Globals::img_idx]);
-        Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
-        Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-        Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-        Globals::colorImg.setFromPixels(Globals::img.getPixels());
-        Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
-
-        // edge detection:
-        Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-        Sobel(Globals::grayImg, Globals::sobel_img);
-        Globals::sobel_img.update();
-        Globals::edge_img.update();
-
-        Scanner::getMinMax(Globals::edge_img.getPixels());
-
-        Scanner::scan_iteration = 0;
-        cout << "loading image " + Globals::images[Globals::img_idx] << endl;
+        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        Controls::doQuickScanNextUpdate = false;
     }
+
+    // if (Scanner::scan_iteration >= Scanner::maxIterations)
+    // {
+    //     Globals::img_idx = (Globals::img_idx + 1) % 3;
+
+    //     // images setup:
+    //     Globals::img.load(Globals::images[Globals::img_idx]);
+    //     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    //     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    //     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    //     Globals::colorImg.setFromPixels(Globals::img.getPixels());
+    //     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
+
+    //     // edge detection:
+    //     Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+    //     Sobel(Globals::grayImg, Globals::sobel_img);
+    //     Globals::sobel_img.update();
+    //     Globals::edge_img.update();
+
+    //     Scanner::getMinMax(Globals::edge_img.getPixels());
+
+    //     Scanner::scan_iteration = 0;
+    //     cout << "loading image " + Globals::images[Globals::img_idx] << endl;
+    // }
 }
 
 //--------------------------------------------------------------
@@ -206,6 +212,11 @@ void ofApp::keyReleased(int key)
     else if (key == ' ')
     {
         Scanner::scanning = !Scanner::scanning;
+    }
+
+    else if (key == OF_KEY_RETURN)
+    {
+        Controls::loadNextImage();
     }
 }
 
