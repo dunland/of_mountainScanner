@@ -11,36 +11,45 @@ void ofApp::setup()
 
     ofSetVerticalSync(true);
 
-    img.load(images[img_idx]);
-    img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    Globals::img.load(Globals::images[Globals::img_idx]);
+    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    colorImg.allocate(img.getWidth(), img.getHeight());
-    grayImg.allocate(img.getWidth(), img.getHeight());
-    colorImg.setFromPixels(img.getPixels());
-    colorImg.convertToGrayscalePlanarImage(grayImg, 0);
+    Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::colorImg.setFromPixels(Globals::img.getPixels());
+    Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
+    Globals::grayImg.threshold(Controls::img_threshold);
+
+    // edge detection:
+    Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+    Sobel(Globals::grayImg, Globals::sobel_img);
+    Globals::sobel_img.update();
+    Globals::edge_img.update();
+
+    Scanner::quickScan_relative(Globals::edge_img.getPixels());
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
 
-    ofPixels &img_pix = img.getPixels();
+    // ofPixels &img_pix = img.getPixels();
 
-    colorImg.convertToGrayscalePlanarImage(grayImg, 0); // reset grayImg to be updated from scratch in next step
-    grayImg.threshold(Controls::img_threshold);
+    Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0); // reset grayImg to be updated from scratch in next step
+    Globals::grayImg.threshold(Controls::img_threshold);
 
     // edge detection:
-    Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-    Sobel(grayImg, sobel_img);
-    sobel_img.update();
-    edge_img.update();
+    Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+    Sobel(Globals::grayImg, Globals::sobel_img);
+    Globals::sobel_img.update();
+    Globals::edge_img.update();
 
     // --- update min/max Scanner values if limits change -----
     // TODO: make gui global and use gui_lowerRidgeSlider.mouseReleased()
     static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
     if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
     {
-        Scanner::getMinMax(edge_img.getPixels());
+        Scanner::getMinMax(Globals::edge_img.getPixels());
         prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
         cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
     }
@@ -48,7 +57,7 @@ void ofApp::update()
     static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
     if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
     {
-        Scanner::getMinMax(edge_img.getPixels());
+        Scanner::getMinMax(Globals::edge_img.getPixels());
         prev_highRidgeLimit = Scanner::upperRidgeLimit;
         cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
     }
@@ -59,10 +68,10 @@ void ofApp::update()
         switch (Scanner::scan_mode)
         {
         case Absolute:
-            Scanner::scan_absolute(edge_img.getPixels());
+            Scanner::scan_absolute(Globals::edge_img.getPixels());
             break;
         case Relative:
-            Scanner::scan_relative(edge_img.getPixels());
+            Scanner::scan_relative(Globals::edge_img.getPixels());
             break;
 
         default:
@@ -72,26 +81,26 @@ void ofApp::update()
 
     if (Scanner::scan_iteration >= Scanner::maxIterations)
     {
-        img_idx = (img_idx + 1) % 3;
+        Globals::img_idx = (Globals::img_idx + 1) % 3;
 
         // images setup:
-        img.load(images[img_idx]);
-        img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
-        colorImg.allocate(img.getWidth(), img.getHeight());
-        grayImg.allocate(img.getWidth(), img.getHeight());
-        colorImg.setFromPixels(img.getPixels());
-        colorImg.convertToGrayscalePlanarImage(grayImg, 0);
+        Globals::img.load(Globals::images[Globals::img_idx]);
+        Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+        Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+        Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+        Globals::colorImg.setFromPixels(Globals::img.getPixels());
+        Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
 
         // edge detection:
-        Canny(grayImg, edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-        Sobel(grayImg, sobel_img);
-        sobel_img.update();
-        edge_img.update();
+        Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+        Sobel(Globals::grayImg, Globals::sobel_img);
+        Globals::sobel_img.update();
+        Globals::edge_img.update();
 
-        Scanner::getMinMax(edge_img.getPixels());
+        Scanner::getMinMax(Globals::edge_img.getPixels());
 
         Scanner::scan_iteration = 0;
-        cout << "loading image " + images[img_idx] << endl;
+        cout << "loading image " + Globals::images[Globals::img_idx] << endl;
     }
 }
 
@@ -106,23 +115,23 @@ void ofApp::draw()
     switch (Controls::draw_mode)
     {
     case 1:
-        img.draw(0, 0);
+        Globals::img.draw(0, 0);
         break;
     case 2:
-        grayImg.draw(0, 0);
+        Globals::grayImg.draw(0, 0);
         break;
     case 3:
-        sobel_img.draw(0, 0);
+        Globals::sobel_img.draw(0, 0);
         break;
     case 4:
-        edge_img.draw(0, 0);
+        Globals::edge_img.draw(0, 0);
         break;
     default:
         break;
     }
 
     // line detection:
-    Mat mat = toCv(edge_img);
+    Mat mat = toCv(Globals::edge_img);
 
     if (Controls::do_edgeDetection)
     {

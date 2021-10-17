@@ -19,7 +19,7 @@ void consoleApp::setup()
     gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
     gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
     gui.add(gui_scanModeButton.setup("set scan mode", 8, 0, 15));
-    // gui.add(gui_send_button.setup("scan and send compiled data", 8, 0, 15));
+    gui.add(gui_send_button.setup("quickScan and send compiled data", 8, 0, 15));
     gui.setPosition(0, 120);
 
     // communication with Pd
@@ -49,50 +49,13 @@ void consoleApp::update()
 
     Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
     Scanner::upperRidgeLimit = gui_upperRidgeLimit;     // upper scan area
-    // gui_upperRidgeLimit.setMax(gui_lowerRidgeLimit);
-    Scanner::lowerRidgeLimit = gui_lowerRidgeLimit; // lower scan area
-    // gui_lowerRidgeLimit.setMin(gui_upperRidgeLimit);
+    Scanner::lowerRidgeLimit = gui_lowerRidgeLimit;     // lower scan area
 
-    // static int prev_thresh = Controls::edgeThreshold;
-    // if (gui_send_button)
-    // {
-
-    //     for (int i = 0; i < Controls::lines.size(); i++)
-    //     {
-    //         float x1 = Controls::lines[i][0];
-    //         float y1 = Controls::lines[i][1];
-    //         float x2 = Controls::lines[i][2];
-    //         float y2 = Controls::lines[i][3];
-    //         ofPolyline l;
-    //         l.addVertex(x1, y1);
-    //         l.addVertex(x2, y2);
-
-    //         for (float j = 0; j < 1; j += 0.01) // iterating the line
-    //         {
-    //             ofPoint pt = l.getPointAtPercent(j);
-    //             static ofPoint pt_previous = pt;
-
-    //             // get one y for each int(x):
-    //             if (int(pt.x) != int(pt_previous.x))
-    //             {
-    //                 cout << i << " " << pt.x << " " << pt.y << endl;
-    //                 pt_previous = pt;
-
-    //                 // send data:
-    //                 ofxOscMessage m;
-    //                 m.setAddress("/line");
-    //                 m.addIntArg(i);
-    //                 m.addFloatArg(pt.x);
-    //                 if (1 - pt.y / IMAGE_HEIGHT > 0.5)
-    //                     m.addFloatArg(1 - (pt.y / IMAGE_HEIGHT));
-    //                 Communication::sender.sendMessage(m, false);
-
-    //                 ofSleepMillis(1);
-    //             }
-    //         }
-    //     }
-    //     gui_send_button = false;
-    // }
+    if (gui_send_button)
+    {
+        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        gui_send_button = false;
+    }
 
     Scanner::scan_mode = (gui_scanModeButton) ? Absolute : Relative;
 

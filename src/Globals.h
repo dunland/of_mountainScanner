@@ -14,6 +14,19 @@ enum Scan_Mode
     Relative = 1
 };
 
+class Globals
+{
+    public:
+    // images:
+    static string images[3];
+    static int img_idx;
+    static ofxCvColorImage colorImg;
+    static ofxCvGrayscaleImage grayImg;
+
+    // edge detection:
+    static ofImage img, gray_img, edge_img, sobel_img;
+};
+
 //////////////////////////////// SCANNER //////////////////////////////
 class Scanner
 {
@@ -40,6 +53,7 @@ public:
     static void getMinMax(ofPixels &pixels);     // performs an initial quick scan of the outline
     static void scan_absolute(ofPixels &pixels); // looking for white pixels within limits
     static void scan_relative(ofPixels &pixels); // looking for white pixels within limits and convert relative to oscillationCenter
+    static void quickScan_relative(ofPixels &pixels);
 };
 
 //////////////////////////// COMMUNICATION ////////////////////////////

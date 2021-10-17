@@ -1,8 +1,19 @@
 #include "Globals.h"
 #include "ofMain.h"
 
+//////////////////////////////// GLOBALS //////////////////////////////
+
+    // images:
+    string Globals::images[3] = {"mountain_1920x1080.JPG", "02.JPG", "03.JPG"};
+    int Globals::img_idx = 0;
+    ofxCvColorImage Globals::colorImg;
+    ofxCvGrayscaleImage Globals::grayImg;
+
+    // edge detection:
+    ofImage Globals::img, Globals::gray_img, Globals::edge_img, Globals::sobel_img;
+
 //////////////////////////////// SCANNER //////////////////////////////
-Scan_Mode Scanner::scan_mode = Absolute;
+Scan_Mode Scanner::scan_mode = Relative;
 bool Scanner::scanning = false;
 int Scanner::scan_iteration = 0;
 int Scanner::maxIterations = 2;
@@ -45,7 +56,7 @@ void Scanner::drawRidgeLimits()
     ofDrawLine(0, oscillationCenter, ofGetWidth(), oscillationCenter);
 }
 
-// perform an initial quick scan of the outline
+// just returns min and max values of white pixels within limits
 void Scanner::getMinMax(ofPixels &pixels)
 {
     ymin = IMAGE_HEIGHT;
@@ -126,9 +137,9 @@ void Scanner::scan_relative(ofPixels &pixels)
     static int previous_x_pos = 0;
     if (x_pos != previous_x_pos)
     {
-        for (int y = 0; y < IMAGE_HEIGHT; y++)
+        for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
         {
-            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255) && y >= Scanner::upperRidgeLimit && y <= Scanner::lowerRidgeLimit)
+            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
             {
                 float y_out;
 
@@ -160,6 +171,39 @@ void Scanner::scan_relative(ofPixels &pixels)
 
         previous_x_pos = x_pos;
     }
+}
+
+void Scanner::quickScan_relative(ofPixels &pixels)
+{
+    ofxOscMessage m;
+    m.setAddress("/quickScan");
+
+    for (int x = 0; x < IMAGE_WIDTH; x++)
+    {
+        for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
+        {
+            if (pixels.getColor(x, y) == ofColor(255, 255, 255))
+            {
+                float y_out;
+
+                if (y < Scanner::oscillationCenter) // positive values above oscLine
+                {
+                    y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
+                }
+                else if (y > Scanner::oscillationCenter) // negative values below oscLine
+                {
+                    y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
+                }
+
+                m.addFloatArg(y_out);
+                break; // if one y was found, go to next x // TODO: think about something better!
+            }
+        }
+    }
+
+    // send data:
+    cout << m << endl;
+    Communication::sender.sendMessage(m, false);
 }
 
 //////////////////////////// COMMUNICATION ////////////////////////////
