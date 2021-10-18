@@ -17,14 +17,15 @@ Scan_Mode Scanner::scan_mode = Relative;
 bool Scanner::scanning = false;
 int Scanner::scan_iteration = 0;
 int Scanner::maxIterations = 2;
+int Scanner::whitePixelsAbsolute[IMAGE_WIDTH];
 
 int Scanner::x_pos = 0;
 int Scanner::ymin = IMAGE_HEIGHT;
 int Scanner::ymax = 0;
 
 int Scanner::oscillationCenter = IMAGE_HEIGHT / 2;
-int Scanner::upperRidgeLimit = 0;
-int Scanner::lowerRidgeLimit = IMAGE_HEIGHT;
+int Scanner::upperRidgeLimit = IMAGE_HEIGHT / 3;
+int Scanner::lowerRidgeLimit = IMAGE_HEIGHT * 3 / 4;
 bool Scanner::do_draw_limits = true;
 
 // draw vertical rectangle at scanner position
@@ -32,6 +33,8 @@ bool Scanner::do_draw_limits = true;
 void Scanner::draw()
 {
     ofSetColor(250);
+    ofFill();
+    ofSetLineWidth(1);
     switch (Scanner::scan_mode)
     {
     case Absolute:
@@ -45,14 +48,23 @@ void Scanner::draw()
     default:
         break;
     }
+
+    // rectangle at scanning point:
+    ofSetColor(250, 20, 20);
+    ofNoFill();
+    ofSetLineWidth(3);
+    ofDrawRectangle(ofRectangle(x_pos -5 , whitePixelsAbsolute[x_pos] - 5, 10, 10));
 }
 
 // draw horizontal lines as limiters for white pixel detection:
 void Scanner::drawRidgeLimits()
 {
     ofSetColor(250);
+    ofSetLineWidth(1);
+
     ofDrawLine(0, upperRidgeLimit, ofGetWidth(), upperRidgeLimit);
     ofDrawLine(0, lowerRidgeLimit, ofGetWidth(), lowerRidgeLimit);
+    ofSetColor(70, 20, 200);
     ofDrawLine(0, oscillationCenter, ofGetWidth(), oscillationCenter);
 }
 
@@ -183,21 +195,22 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     for (int x = 0; x < IMAGE_WIDTH; x++)
     {
         float y_out = 0;
-        for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
+        for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x, y) == ofColor(255, 255, 255))
             {
 
-                if (y < Scanner::oscillationCenter) // positive values above oscLine
+                if (y < oscillationCenter) // positive values above oscLine
                 {
-                    y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
+                    y_out = (oscillationCenter - y) / float(oscillationCenter - ymin);
                 }
-                else if (y > Scanner::oscillationCenter) // negative values below oscLine
+                else if (y > oscillationCenter) // negative values below oscLine
                 {
-                    y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
+                    y_out = (y - oscillationCenter) / float(ymax - oscillationCenter) * -1;
                 }
 
                 m.addFloatArg(y_out);
+                whitePixelsAbsolute[x] = y;
                 break; // if one y was found, go to next x // TODO: think about something better!
             }
         }
@@ -205,6 +218,7 @@ void Scanner::quickScan_relative(ofPixels &pixels)
 
     // send data:
     Communication::sender.sendMessage(m, false);
+    cout << "sent quickscan data: " << m << endl;
 }
 
 //////////////////////////// COMMUNICATION ////////////////////////////

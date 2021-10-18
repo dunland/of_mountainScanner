@@ -4,7 +4,7 @@
 using namespace ofxCv;
 using namespace cv;
 
-//--------------------------------------------------------------
+////////////////////////////////// SETUP //////////////////////////////
 void ofApp::setup()
 {
     ofSetWindowTitle("ofApp");
@@ -20,33 +20,21 @@ void ofApp::setup()
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
     Globals::grayImg.threshold(Controls::img_threshold);
 
-    // edge detection:
-    // Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-    // Sobel(Globals::grayImg, Globals::sobel_img);
-    // Globals::sobel_img.update();
-    // Globals::edge_img.update();
-
-    // Scanner::quickScan_relative(Globals::edge_img.getPixels());
-
-    // img.load(images[img_idx]);
-    // img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
-
-    // colorImg.allocate(img.getWidth(), img.getHeight());
-    // grayImg.allocate(img.getWidth(), img.getHeight());
-    // colorImg.setFromPixels(img.getPixels());
-    // colorImg.convertToGrayscalePlanarImage(grayImg, 0);
+    Controls::doQuickScanNextUpdate = true;
 }
 
-//--------------------------------------------------------------
+////////////////////////////////// UPDATE /////////////////////////////
 void ofApp::update()
 {
 
+    // --------- load next image upon request: ------------------------
     if (Controls::doLoadNextImage)
     {
         Controls::loadNextImage();
         Controls::doLoadNextImage = false;
     }
 
+    // ---------------------- IMAGE CONVERSIONS -----------------------
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0); // reset grayImg to be updated from scratch in next step
     Globals::grayImg.threshold(Controls::img_threshold);
 
@@ -56,7 +44,7 @@ void ofApp::update()
     Globals::sobel_img.update();
     Globals::edge_img.update();
 
-    // --- update min/max Scanner values if limits change -----
+    // ---------------- observe limits changes -----------------------
     // TODO: make gui global and use gui_lowerRidgeSlider.mouseReleased()
     static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
     if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
@@ -74,7 +62,7 @@ void ofApp::update()
         cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
     }
 
-    // ------------ perform the scanning -----------------------
+    // ------------------- perform the scanning -----------------------
     if (Scanner::scanning)
     {
         switch (Scanner::scan_mode)
@@ -91,7 +79,7 @@ void ofApp::update()
         }
     }
 
-    if (Controls::doQuickScanNextUpdate)
+    if (Controls::doQuickScanNextUpdate && ofGetFrameNum() > 10)
     {
         Scanner::quickScan_relative(Globals::edge_img.getPixels());
         Controls::doQuickScanNextUpdate = false;
@@ -122,7 +110,7 @@ void ofApp::update()
     // }
 }
 
-//--------------------------------------------------------------
+/////////////////////////////////// DRAW //////////////////////////////
 void ofApp::draw()
 {
     ofBackground(0);

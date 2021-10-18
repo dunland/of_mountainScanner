@@ -40,10 +40,11 @@ public:
     static bool scanning;
     static int scan_iteration;
     static int maxIterations;
+    static int whitePixelsAbsolute[IMAGE_WIDTH];
 
-    static int x_pos;
-    static int ymin;
-    static int ymax;
+    static int x_pos; // current postion of the scanner
+    static int ymin;  // uppermost white pixel within boundaries
+    static int ymax;  // lowest white pixel within boundaries
 
     static int oscillationCenter;
     static int upperRidgeLimit; // upper limit for white pixel detection
@@ -51,8 +52,8 @@ public:
     static bool do_draw_limits;
 
     static void draw();
-    static void drawRidgeLimits();
-    static void getMinMax(ofPixels &pixels);     // performs an initial quick scan of the outline
+    static void drawRidgeLimits();               // draws limits for pixel detection and oscillation center line
+    static void getMinMax(ofPixels &pixels);     // calculates min and max y values within the boundaries
     static void scan_absolute(ofPixels &pixels); // looking for white pixels within limits
     static void scan_relative(ofPixels &pixels); // looking for white pixels within limits and convert relative to oscillationCenter
     static void quickScan_relative(ofPixels &pixels);
