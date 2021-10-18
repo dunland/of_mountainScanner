@@ -11,7 +11,7 @@ void ofApp::setup()
 
     ofSetVerticalSync(true);
 
-    Globals::img.load(Globals::images[Globals::img_idx]);
+    Globals::img.loadImage(Globals::images[Globals::img_idx]);
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
@@ -21,19 +21,31 @@ void ofApp::setup()
     Globals::grayImg.threshold(Controls::img_threshold);
 
     // edge detection:
-    Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-    Sobel(Globals::grayImg, Globals::sobel_img);
-    Globals::sobel_img.update();
-    Globals::edge_img.update();
+    // Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
+    // Sobel(Globals::grayImg, Globals::sobel_img);
+    // Globals::sobel_img.update();
+    // Globals::edge_img.update();
 
-    Scanner::quickScan_relative(Globals::edge_img.getPixels());
+    // Scanner::quickScan_relative(Globals::edge_img.getPixels());
+
+    // img.load(images[img_idx]);
+    // img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+
+    // colorImg.allocate(img.getWidth(), img.getHeight());
+    // grayImg.allocate(img.getWidth(), img.getHeight());
+    // colorImg.setFromPixels(img.getPixels());
+    // colorImg.convertToGrayscalePlanarImage(grayImg, 0);
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
 
-    // ofPixels &img_pix = img.getPixels();
+    if (Controls::doLoadNextImage)
+    {
+        Controls::loadNextImage();
+        Controls::doLoadNextImage = false;
+    }
 
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0); // reset grayImg to be updated from scratch in next step
     Globals::grayImg.threshold(Controls::img_threshold);
@@ -159,6 +171,7 @@ void ofApp::draw()
     }
 
     Scanner::draw();
+
     if (Scanner::do_draw_limits)
         Scanner::drawRidgeLimits();
 }
@@ -216,15 +229,13 @@ void ofApp::keyReleased(int key)
 
     else if (key == OF_KEY_RETURN)
     {
-        Controls::loadNextImage();
+        Controls::doLoadNextImage = true;
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y)
 {
-    // mouse_x = ofGetMouseX();
-    // cout << mouse_x << endl;
 }
 
 //--------------------------------------------------------------

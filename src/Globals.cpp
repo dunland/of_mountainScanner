@@ -218,6 +218,7 @@ int Controls::img_threshold;
 // Hough Lines
 bool Controls::do_edgeDetection = false;
 bool Controls::doQuickScanNextUpdate = false;
+bool Controls::doLoadNextImage = false;
 int Controls::edgeThreshold;
 int Controls::lineThreshold;
 int Controls::lowThreshold;
@@ -238,8 +239,10 @@ void Controls::loadNextImage()
 
     Globals::img.load(Globals::images[Globals::img_idx]);
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+
     Globals::colorImg.setFromPixels(Globals::img.getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
     Globals::grayImg.threshold(Controls::img_threshold);
@@ -249,7 +252,9 @@ void Controls::loadNextImage()
     Sobel(Globals::grayImg, Globals::sobel_img);
     Globals::sobel_img.update();
     Globals::edge_img.update();
+
     cout << "loading image " + Globals::images[Globals::img_idx] << endl;
+
     Scanner::scan_iteration = 0;
     Controls::doQuickScanNextUpdate = true;
 }

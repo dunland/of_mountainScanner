@@ -18,7 +18,7 @@ enum Scan_Mode
 
 class Globals
 {
-    public:
+public:
     // images:
     static string images[3];
     static int img_idx;
@@ -80,6 +80,7 @@ public:
     // Hough Transform Lines
     static bool do_edgeDetection;
     static bool doQuickScanNextUpdate;
+    static bool doLoadNextImage; // flag to load next image during next update
     static int edgeThreshold;
     static int lineThreshold;
     static int lowThreshold;

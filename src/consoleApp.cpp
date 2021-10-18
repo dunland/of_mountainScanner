@@ -99,6 +99,9 @@ void consoleApp::draw()
         ofDrawBitmapString(scanModeStr, 20, 90);
     }
 
+        string currentImgStr = "image: " + Globals::images[Globals::img_idx];
+        ofDrawBitmapString(currentImgStr, 20, 110);
+
     gui.draw();
 }
 
@@ -149,9 +152,9 @@ void consoleApp::keyReleased(int key)
         Scanner::scanning = !Scanner::scanning;
     }
 
-    else if (key == OF_KEY_RETURN)
+   else if (key == OF_KEY_RETURN)
     {
-        Controls::loadNextImage();
+        Controls::doLoadNextImage = true;
     }
 }
 
