@@ -20,7 +20,7 @@ class Globals
 {
 public:
     // images:
-    static string images[3];
+    static string images[NUM_OF_IMAGES];
     static int img_idx;
     static ofxCvColorImage colorImg;
     static ofxCvGrayscaleImage grayImg;
@@ -76,7 +76,8 @@ public:
     static int draw_mode;
 
     // image threshold
-    static int img_threshold;
+    static int img_thresholdLow;
+    static int img_thresholdHigh;
 
     // Hough Transform Lines
     static bool do_edgeDetection;

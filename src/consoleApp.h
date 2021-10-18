@@ -28,7 +28,8 @@ public:
     // TODO: global GUI, keine doppelten Variablen
 
     ofxPanel gui;
-    ofxIntSlider gui_imgThreshold;
+    ofxIntSlider gui_imgThresholdLow;
+    ofxIntSlider gui_imgThresholdHigh;
 
     // hough lines:
     ofxIntSlider gui_edgeThreshold;

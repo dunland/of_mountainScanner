@@ -18,7 +18,7 @@ void ofApp::setup()
     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
     Globals::colorImg.setFromPixels(Globals::img.getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
-    Globals::grayImg.threshold(Controls::img_threshold);
+    Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
 
     Controls::doQuickScanNextUpdate = true;
 }
@@ -36,31 +36,13 @@ void ofApp::update()
 
     // ---------------------- IMAGE CONVERSIONS -----------------------
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0); // reset grayImg to be updated from scratch in next step
-    Globals::grayImg.threshold(Controls::img_threshold);
+    Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
 
     // edge detection:
     Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
     Sobel(Globals::grayImg, Globals::sobel_img);
     Globals::sobel_img.update();
     Globals::edge_img.update();
-
-    // ---------------- observe limits changes -----------------------
-    // TODO: make gui global and use gui_lowerRidgeSlider.mouseReleased()
-    static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
-    if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
-    {
-        Scanner::getMinMax(Globals::edge_img.getPixels());
-        prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
-        cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
-    }
-
-    static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
-    if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
-    {
-        Scanner::getMinMax(Globals::edge_img.getPixels());
-        prev_highRidgeLimit = Scanner::upperRidgeLimit;
-        cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
-    }
 
     // ------------------- perform the scanning -----------------------
     if (Scanner::scanning)
@@ -87,7 +69,7 @@ void ofApp::update()
 
     // if (Scanner::scan_iteration >= Scanner::maxIterations)
     // {
-    //     Globals::img_idx = (Globals::img_idx + 1) % 3;
+    //     Globals::img_idx = (Globals::img_idx + 1) % NUM_OF_IMAGES;
 
     //     // images setup:
     //     Globals::img.load(Globals::images[Globals::img_idx]);

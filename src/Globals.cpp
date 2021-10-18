@@ -227,7 +227,8 @@ ofxOscReceiver Communication::receiver;
 
 /////////////////////////////// CONTROLS //////////////////////////////
 int Controls::draw_mode = 4;
-int Controls::img_threshold;
+int Controls::img_thresholdLow;
+int Controls::img_thresholdHigh;
 
 // Hough Lines
 bool Controls::do_edgeDetection = false;
@@ -249,7 +250,7 @@ vector<Vec4i> Controls::lines;
 void Controls::loadNextImage()
 {
     // images setup:
-    Globals::img_idx = (Globals::img_idx + 1) % 3;
+    Globals::img_idx = (Globals::img_idx + 1) % NUM_OF_IMAGES;
 
     Globals::img.load(Globals::images[Globals::img_idx]);
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -259,7 +260,7 @@ void Controls::loadNextImage()
 
     Globals::colorImg.setFromPixels(Globals::img.getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
-    Globals::grayImg.threshold(Controls::img_threshold);
+    Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
 
     // edge detection:
     Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);

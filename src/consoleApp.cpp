@@ -8,7 +8,8 @@ void consoleApp::setup()
     ofSetWindowTitle("consoleApp");
 
     gui.setup();
-    gui.add(gui_imgThreshold.setup("Image Threshold", 113, 0, 255));
+    gui.add(gui_imgThresholdLow.setup("Image Low Threshold", 113, 0, 255));
+    gui.add(gui_imgThresholdHigh.setup("Image High Threshold", 0, 0, 1));
     // gui.add(gui_canny_1.setup("Canny Threshold 1", 0, 0, 255));
     // gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
     // gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
@@ -39,7 +40,8 @@ void consoleApp::setup()
 void consoleApp::update()
 {
     // update gui variables:
-    Controls::img_threshold = gui_imgThreshold;  // img threshold
+    Controls::img_thresholdLow = gui_imgThresholdLow;  // img threshold
+    Controls::img_thresholdHigh = gui_imgThresholdHigh;  // img threshold
     Controls::canny_1 = gui_canny_1;             // img threshold
     Controls::canny_2 = gui_canny_2;             // img threshold
     Controls::edgeThreshold = gui_edgeThreshold; // line detection
@@ -47,6 +49,7 @@ void consoleApp::update()
     Controls::minLineLength = gui_minLineLength; // line detection
     Controls::maxLineGap = gui_maxLineGap;       // line detection
 
+    // TODO: quickScan whenever one of these was changed (via gui.mouseRelease)
     Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
     Scanner::upperRidgeLimit = gui_upperRidgeLimit;     // upper scan area
     Scanner::lowerRidgeLimit = gui_lowerRidgeLimit;     // lower scan area
@@ -59,14 +62,34 @@ void consoleApp::update()
 
     Scanner::scan_mode = (gui_scanModeButton) ? Relative : Absolute;
 
-    ofxOscMessage incoming_message;
-    Communication::receiver.getNextMessage(incoming_message);
-
-    if (incoming_message.getAddress() == "/scanner/pos")
+    // ---------------- observe limits changes -----------------------
+    // TODO: use gui_lowerRidgeSlider.mouseReleased()
+    static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+    if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
     {
-        Scanner::x_pos = incoming_message.getArgAsInt(0);
-        cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
+        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+        cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
     }
+
+    static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
+    if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
+    {
+        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        prev_highRidgeLimit = Scanner::upperRidgeLimit;
+        cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
+    }
+
+
+    // ------------------------ communication -------------------------
+    // ofxOscMessage incoming_message;
+    // Communication::receiver.getNextMessage(incoming_message);
+
+    // if (incoming_message.getAddress() == "/scanner/pos")
+    // {
+    //     Scanner::x_pos = incoming_message.getArgAsInt(0);
+    //     cout << "incoming message at " << incoming_message.getAddress() << ": " << incoming_message.getArgAsInt(0) << endl;
+    // }
 }
 
 //--------------------------------------------------------------
