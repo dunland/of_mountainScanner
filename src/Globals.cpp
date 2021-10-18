@@ -176,7 +176,7 @@ void Scanner::scan_relative(ofPixels &pixels)
 void Scanner::quickScan_relative(ofPixels &pixels)
 {
     ofxOscMessage m;
-    m.setAddress("/quickScan");
+    m.setAddress("/quickScan/" + ofToString(Globals::img_idx));
 
     getMinMax(pixels);
 
