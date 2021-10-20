@@ -147,21 +147,26 @@ void Scanner::scan_relative(ofPixels &pixels)
     static int previous_x_pos = 0;
     if (x_pos != previous_x_pos)
     {
-        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
-        for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
+        float y_out = 0;
+        for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
             {
-                if (y < Scanner::oscillationCenter) // positive values above oscLine
+                if (y < oscillationCenter) // positive values above oscLine
                 {
                     y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
                 }
-                else if (y > Scanner::oscillationCenter) // negative values below oscLine
+                else if (y > oscillationCenter) // negative values below oscLine
                 {
                     y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
                 }
 
                 // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+
+                // ATTENTION! y_out gets infinitely(?) large when crossing oscillationCenter.
+                // workaround: hard-limit for y_out between -1 and 1!
+                // TODO: fix this mathematically!
+                // y_out = (y_out > -1 && y_out < 1) ? y_out : oscillationCenter;
 
                 // send data:
                 ofxOscMessage m;
@@ -169,6 +174,8 @@ void Scanner::scan_relative(ofPixels &pixels)
                 m.addFloatArg(x_pos);
                 m.addFloatArg(y_out);
                 Communication::sender.sendMessage(m, false);
+
+                cout << Scanner::x_pos << " " << Scanner::whitePixelsAbsolute[Scanner::x_pos] << " " << Scanner::ymin << " " << Scanner::oscillationCenter << " " << Scanner::ymax << " " << y_out << endl;
             }
         }
 
@@ -179,6 +186,7 @@ void Scanner::scan_relative(ofPixels &pixels)
     }
 }
 
+// -------------------------- QUICK SCANNING --------------------------
 void Scanner::quickScan_relative(ofPixels &pixels)
 {
     ofxOscMessage m;
@@ -192,7 +200,7 @@ void Scanner::quickScan_relative(ofPixels &pixels)
 
     for (int x = 0; x < IMAGE_WIDTH; x++)
     {
-        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
+        float y_out = 0;
         for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x, y) == ofColor(255, 255, 255))
@@ -206,6 +214,11 @@ void Scanner::quickScan_relative(ofPixels &pixels)
                 {
                     y_out = (y - oscillationCenter) / float(ymax - oscillationCenter) * -1;
                 }
+
+                // ATTENTION! y_out gets infinitely(?) large when crossing oscillationCenter.
+                // workaround: hard-limit for y_out between -1 and 1!
+                // TODO: fix this mathematically!
+                // y_out = (y_out > -1 && y_out < 1) ? y_out : oscillationCenter;
 
                 m.addFloatArg(y_out);
                 whitePixelsAbsolute[x] = y;

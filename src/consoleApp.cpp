@@ -40,14 +40,14 @@ void consoleApp::setup()
 void consoleApp::update()
 {
     // update gui variables:
-    Controls::img_thresholdLow = gui_imgThresholdLow;  // img threshold
-    Controls::img_thresholdHigh = gui_imgThresholdHigh;  // img threshold
-    Controls::canny_1 = gui_canny_1;             // img threshold
-    Controls::canny_2 = gui_canny_2;             // img threshold
-    Controls::edgeThreshold = gui_edgeThreshold; // line detection
-    Controls::lineThreshold = gui_lineThreshold; // line detection
-    Controls::minLineLength = gui_minLineLength; // line detection
-    Controls::maxLineGap = gui_maxLineGap;       // line detection
+    Controls::img_thresholdLow = gui_imgThresholdLow;   // img threshold
+    Controls::img_thresholdHigh = gui_imgThresholdHigh; // img threshold
+    Controls::canny_1 = gui_canny_1;                    // img threshold
+    Controls::canny_2 = gui_canny_2;                    // img threshold
+    Controls::edgeThreshold = gui_edgeThreshold;        // line detection
+    Controls::lineThreshold = gui_lineThreshold;        // line detection
+    Controls::minLineLength = gui_minLineLength;        // line detection
+    Controls::maxLineGap = gui_maxLineGap;              // line detection
 
     // TODO: quickScan whenever one of these was changed (via gui.mouseRelease)
     Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
@@ -80,6 +80,13 @@ void consoleApp::update()
         cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
     }
 
+    static int prev_oscillationCenter = Scanner::oscillationCenter;
+    if (prev_oscillationCenter != Scanner::oscillationCenter)
+    {
+        Controls::doQuickScanNextUpdate = true;
+        prev_oscillationCenter = Scanner::oscillationCenter;
+        cout << "oscillationCenter changed! new limit at " << Scanner::oscillationCenter << " <-- ymax at" << Scanner::oscillationCenter << endl;
+    }
 
     // ------------------------ communication -------------------------
     // ofxOscMessage incoming_message;
@@ -122,8 +129,8 @@ void consoleApp::draw()
         ofDrawBitmapString(scanModeStr, 20, 90);
     }
 
-        string currentImgStr = "image: " + Globals::images[Globals::img_idx];
-        ofDrawBitmapString(currentImgStr, 20, 110);
+    string currentImgStr = "image: " + Globals::images[Globals::img_idx];
+    ofDrawBitmapString(currentImgStr, 20, 110);
 
     gui.draw();
 }
@@ -175,7 +182,7 @@ void consoleApp::keyReleased(int key)
         Scanner::scanning = !Scanner::scanning;
     }
 
-   else if (key == OF_KEY_RETURN)
+    else if (key == OF_KEY_RETURN)
     {
         Controls::doLoadNextImage = true;
     }
