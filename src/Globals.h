@@ -26,7 +26,7 @@ public:
     static ofxCvGrayscaleImage grayImg;
 
     // edge detection:
-    static ofImage img, gray_img, edge_img, sobel_img;
+    static ofImage img, edge_img, sobel_img;
 };
 
 //////////////////////////////// SCANNER //////////////////////////////

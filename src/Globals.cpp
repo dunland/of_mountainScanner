@@ -10,7 +10,7 @@ ofxCvColorImage Globals::colorImg;
 ofxCvGrayscaleImage Globals::grayImg;
 
 // edge detection:
-ofImage Globals::img, Globals::gray_img, Globals::edge_img, Globals::sobel_img;
+ofImage Globals::img, Globals::edge_img, Globals::sobel_img;
 
 //////////////////////////////// SCANNER //////////////////////////////
 Scan_Mode Scanner::scan_mode = Relative;
@@ -53,7 +53,7 @@ void Scanner::draw()
     ofSetColor(250, 20, 20);
     ofNoFill();
     ofSetLineWidth(3);
-    ofDrawRectangle(ofRectangle(x_pos -5 , whitePixelsAbsolute[x_pos] - 5, 10, 10));
+    ofDrawRectangle(ofRectangle(x_pos - 5, whitePixelsAbsolute[x_pos] - 5, 10, 10));
 }
 
 // draw horizontal lines as limiters for white pixel detection:
@@ -115,11 +115,12 @@ void Scanner::scan_absolute(ofPixels &pixels)
     static int previous_x_pos = 0;
     if (x_pos != previous_x_pos)
     {
+        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
         for (int y = 0; y < IMAGE_HEIGHT; y++)
         {
             if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
             {
-                float y_out = 1 - (y / 1080.0);
+                y_out = 1 - (y / 1080.0);
                 // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
                 // send data:
@@ -131,11 +132,8 @@ void Scanner::scan_absolute(ofPixels &pixels)
             }
         }
 
-        // if (x_pos >= IMAGE_WIDTH - 1)
-        // {
-        //     scan_iteration++;
-        //     cout << "reached end of image. scan_iteration ++" << endl;
-        // }
+        if (x_pos >= IMAGE_WIDTH - 1)
+            scan_iteration++;
 
         previous_x_pos = x_pos;
     }
@@ -149,12 +147,11 @@ void Scanner::scan_relative(ofPixels &pixels)
     static int previous_x_pos = 0;
     if (x_pos != previous_x_pos)
     {
+        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
         for (int y = Scanner::upperRidgeLimit; y < Scanner::lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
             {
-                float y_out;
-
                 if (y < Scanner::oscillationCenter) // positive values above oscLine
                 {
                     y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
@@ -175,11 +172,8 @@ void Scanner::scan_relative(ofPixels &pixels)
             }
         }
 
-        // if (x_pos >= IMAGE_WIDTH - 1)
-        // {
-        //     scan_iteration++;
-        //     cout << "reached end of image. scan_iteration ++" << endl;
-        // }
+        if (x_pos >= IMAGE_WIDTH - 1)
+            scan_iteration++;
 
         previous_x_pos = x_pos;
     }
@@ -193,8 +187,12 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     getMinMax(pixels);
 
     for (int x = 0; x < IMAGE_WIDTH; x++)
+        for (int y = 0; y < IMAGE_HEIGHT; y++)
+            whitePixelsAbsolute[x] = oscillationCenter;
+
+    for (int x = 0; x < IMAGE_WIDTH; x++)
     {
-        float y_out = 0;
+        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
         for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
         {
             if (pixels.getColor(x, y) == ofColor(255, 255, 255))

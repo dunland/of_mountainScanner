@@ -357,7 +357,7 @@
 #000000 #000000;
 #X obj 820 230 spigot;
 #X obj 880 230 tgl 15 0 empty empty repeat 17 7 0 10 #00ccff #000000
-#000000 0 1;
+#000000 1 1;
 #X obj 560 171 / 2;
 #X obj 560 200 + 0.5;
 #X text 460 200 remap to 0 \, 1;
@@ -608,11 +608,11 @@
 #X restore 40 530 graph;
 #X floatatom 524 565 5 0 0 0 - - -, f 5;
 #X obj 470 590 array set scan_0;
-#X obj 830 590 tabplay~ scan_0;
+#X obj 610 560 tabplay~ scan_0;
 #X obj 830 940 dac~;
-#X obj 830 570 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#X obj 610 540 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
 #000000 #000000;
-#N canvas 240 218 960 491 osc_communication 1;
+#N canvas 251 374 960 516 osc_communication 1;
 #X floatatom 683 95 3 0 0 0 - - -, f 3;
 #X floatatom 710 95 3 0 0 0 - - -, f 3;
 #X floatatom 737 95 3 0 0 0 - - -, f 3;
@@ -1204,8 +1204,8 @@
 #X obj 690 480 dac~;
 #X floatatom 524 565 5 0 0 0 - - -, f 5;
 #X obj 470 590 array set scan_0;
-#X obj 830 590 tabplay~ scan_0;
-#X obj 830 570 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#X obj 610 560 tabplay~ scan_0;
+#X obj 610 540 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
 #000000 #000000;
 #X obj 470 530 r OSCquickScan_0;
 #X floatatom 514 725 5 0 0 0 - - -, f 5;

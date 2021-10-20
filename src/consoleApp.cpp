@@ -67,7 +67,7 @@ void consoleApp::update()
     static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
     if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
     {
-        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        Controls::doQuickScanNextUpdate = true;
         prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
         cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
     }
@@ -75,7 +75,7 @@ void consoleApp::update()
     static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
     if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
     {
-        Scanner::quickScan_relative(Globals::edge_img.getPixels());
+        Controls::doQuickScanNextUpdate = true;
         prev_highRidgeLimit = Scanner::upperRidgeLimit;
         cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
     }
