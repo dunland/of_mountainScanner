@@ -1,3 +1,12 @@
+/*
+mountainScanner
+by David Unland
+
+The app will scan all ".jpg" images in the ./bin/data folder.
+Settings, like number of scans until  are to be set in settings.h
+*/
+
+
 #include "ofApp.h"
 #include "Globals.h"
 
@@ -11,7 +20,21 @@ void ofApp::setup()
 
     ofSetVerticalSync(true);
 
-    Globals::img.loadImage(Globals::images[Globals::img_idx]);
+    // setup images
+    ofDirectory dir("");
+    dir.allowExt("jpg");
+    dir.listDir();
+    dir = dir.getSorted();
+    for (int i = 0; i < dir.size(); i++)
+    {
+        ofLogNotice(dir.getPath(i));
+        Globals::images.push_back(dir.getPath(i));
+    }
+
+    // for (int i = 0; i < NUM_OF_IMAGES; i++)
+    //     Globals::images[i] += Globals::images[i]; // prepend path
+
+    Globals::img.loadImage(Globals::images.at(Globals::img_idx));
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
@@ -51,9 +74,11 @@ void ofApp::update()
         {
         case Absolute:
             Scanner::scan_absolute(Globals::edge_img.getPixels());
+            Scanner::scan_absolute(Globals::edge_img.getPixels()); // scan at twice the speed
             break;
         case Relative:
             Scanner::scan_relative(Globals::edge_img.getPixels());
+            Scanner::scan_relative(Globals::edge_img.getPixels()); // scan at twice the speed
             break;
 
         default:
@@ -66,30 +91,6 @@ void ofApp::update()
         Scanner::quickScan_relative(Globals::edge_img.getPixels());
         Controls::doQuickScanNextUpdate = false;
     }
-
-    // if (Scanner::scan_iteration >= Scanner::maxIterations)
-    // {
-    //     Globals::img_idx = (Globals::img_idx + 1) % NUM_OF_IMAGES;
-
-    //     // images setup:
-    //     Globals::img.load(Globals::images[Globals::img_idx]);
-    //     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
-    //     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-    //     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-    //     Globals::colorImg.setFromPixels(Globals::img.getPixels());
-    //     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
-
-    //     // edge detection:
-    //     Canny(Globals::grayImg, Globals::edge_img, Controls::canny_1, Controls::canny_2, Controls::canny_3);
-    //     Sobel(Globals::grayImg, Globals::sobel_img);
-    //     Globals::sobel_img.update();
-    //     Globals::edge_img.update();
-
-    //     Scanner::getMinMax(Globals::edge_img.getPixels());
-
-    //     Scanner::scan_iteration = 0;
-    //     cout << "loading image " + Globals::images[Globals::img_idx] << endl;
-    // }
 }
 
 /////////////////////////////////// DRAW //////////////////////////////

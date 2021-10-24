@@ -4,7 +4,7 @@
 //////////////////////////////// GLOBALS //////////////////////////////
 
 // images:
-string Globals::images[3] = {"mountain_1920x1080.JPG", "02.JPG", "03.JPG"};
+vector<string> Globals::images;
 int Globals::img_idx = 0;
 ofxCvColorImage Globals::colorImg;
 ofxCvGrayscaleImage Globals::grayImg;
@@ -16,7 +16,7 @@ ofImage Globals::img, Globals::edge_img, Globals::sobel_img;
 Scan_Mode Scanner::scan_mode = Relative;
 bool Scanner::scanning = false;
 int Scanner::scan_iteration = 0;
-int Scanner::maxIterations = 2;
+int Scanner::maxIterations = MAX_SCAN_ITERATIONS;
 int Scanner::whitePixelsAbsolute[IMAGE_WIDTH];
 
 int Scanner::x_pos = 0;
@@ -133,7 +133,11 @@ void Scanner::scan_absolute(ofPixels &pixels)
         }
 
         if (x_pos >= IMAGE_WIDTH - 1)
+        {
             scan_iteration++;
+            if (Scanner::scan_iteration >= Scanner::maxIterations)
+                Controls::loadNextImage();
+        }
 
         previous_x_pos = x_pos;
     }
@@ -163,11 +167,6 @@ void Scanner::scan_relative(ofPixels &pixels)
 
                 // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
-                // ATTENTION! y_out gets infinitely(?) large when crossing oscillationCenter.
-                // workaround: hard-limit for y_out between -1 and 1!
-                // TODO: fix this mathematically!
-                // y_out = (y_out > -1 && y_out < 1) ? y_out : oscillationCenter;
-
                 // send data:
                 ofxOscMessage m;
                 m.setAddress("/rt_scan");
@@ -180,7 +179,11 @@ void Scanner::scan_relative(ofPixels &pixels)
         }
 
         if (x_pos >= IMAGE_WIDTH - 1)
+        {
             scan_iteration++;
+            if (Scanner::scan_iteration >= Scanner::maxIterations)
+                Controls::loadNextImage();
+        }
 
         previous_x_pos = x_pos;
     }
@@ -214,11 +217,6 @@ void Scanner::quickScan_relative(ofPixels &pixels)
                 {
                     y_out = (y - oscillationCenter) / float(ymax - oscillationCenter) * -1;
                 }
-
-                // ATTENTION! y_out gets infinitely(?) large when crossing oscillationCenter.
-                // workaround: hard-limit for y_out between -1 and 1!
-                // TODO: fix this mathematically!
-                // y_out = (y_out > -1 && y_out < 1) ? y_out : oscillationCenter;
 
                 m.addFloatArg(y_out);
                 whitePixelsAbsolute[x] = y;
@@ -263,7 +261,7 @@ void Controls::loadNextImage()
     // images setup:
     Globals::img_idx = (Globals::img_idx + 1) % NUM_OF_IMAGES;
 
-    Globals::img.load(Globals::images[Globals::img_idx]);
+    Globals::img.load(Globals::images.at(Globals::img_idx));
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
@@ -279,7 +277,7 @@ void Controls::loadNextImage()
     Globals::sobel_img.update();
     Globals::edge_img.update();
 
-    cout << "loading image " + Globals::images[Globals::img_idx] << endl;
+    ofLogNotice("loading image " + Globals::images.at(Globals::img_idx));
 
     Scanner::scan_iteration = 0;
     Controls::doQuickScanNextUpdate = true;

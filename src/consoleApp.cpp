@@ -9,7 +9,7 @@ void consoleApp::setup()
 
     gui.setup();
     gui.add(gui_imgThresholdLow.setup("Image Low Threshold", 113, 0, 255));
-    gui.add(gui_imgThresholdHigh.setup("Image High Threshold", 0, 0, 1));
+    // gui.add(gui_imgThresholdHigh.setup("Image High Threshold", 0, 0, 1));
     // gui.add(gui_canny_1.setup("Canny Threshold 1", 0, 0, 255));
     // gui.add(gui_canny_2.setup("Canny Threshold 2", 0, 0, 255));
     // gui.add(gui_edgeThreshold.setup("Edge Threshold", 50, 0, 100));
@@ -85,7 +85,15 @@ void consoleApp::update()
     {
         Controls::doQuickScanNextUpdate = true;
         prev_oscillationCenter = Scanner::oscillationCenter;
-        cout << "oscillationCenter changed! new limit at " << Scanner::oscillationCenter << " <-- ymax at" << Scanner::oscillationCenter << endl;
+        cout << "oscillationCenter changed! " << Scanner::oscillationCenter << " <-- oscillating at" << Scanner::oscillationCenter << endl;
+    }
+
+    static int prev_imgThreshold = Controls::img_thresholdLow;
+    if (prev_imgThreshold != Controls::img_thresholdLow)
+    {
+        Controls::doQuickScanNextUpdate = true;
+        prev_imgThreshold = Controls::img_thresholdLow;
+        cout << "img threshold changed! " << Controls::img_thresholdLow << " <-- now at" << Controls::img_thresholdLow << endl;
     }
 
     // ------------------------ communication -------------------------

@@ -7,7 +7,7 @@
 int main( ){
 
 	ofGLWindowSettings settings;
-	settings.setSize(960, 1080);
+	settings.setSize(960, 540);
 	settings.setPosition(ofVec2f(0, 0));
 	auto mainWindow = ofCreateWindow(settings);
 

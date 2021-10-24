@@ -20,7 +20,7 @@ class Globals
 {
 public:
     // images:
-    static string images[NUM_OF_IMAGES];
+    static vector<string> images;
     static int img_idx;
     static ofxCvColorImage colorImg;
     static ofxCvGrayscaleImage grayImg;
