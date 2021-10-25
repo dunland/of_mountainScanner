@@ -6,7 +6,6 @@ The app will scan all ".jpg" images in the ./bin/data folder.
 Settings, like number of scans until  are to be set in settings.h
 */
 
-
 #include "ofApp.h"
 #include "Globals.h"
 
@@ -21,24 +20,21 @@ void ofApp::setup()
     ofSetVerticalSync(true);
 
     // setup images
-    ofDirectory dir("");
+    ofDirectory dir(""); // read folder ./bin/data
     dir.allowExt("jpg");
     dir.listDir();
     dir = dir.getSorted();
     for (int i = 0; i < dir.size(); i++)
-    {
-        ofLogNotice(dir.getPath(i));
         Globals::images.push_back(dir.getPath(i));
-    }
-
-    // for (int i = 0; i < NUM_OF_IMAGES; i++)
-    //     Globals::images[i] += Globals::images[i]; // prepend path
 
     Globals::img.loadImage(Globals::images.at(Globals::img_idx));
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-    Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::scaledImage.loadImage(Globals::images.at(Globals::img_idx));
+    Globals::scaledImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
+
+    Globals::colorImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
+    Globals::grayImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
     Globals::colorImg.setFromPixels(Globals::img.getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
     Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
@@ -67,6 +63,9 @@ void ofApp::update()
     Globals::sobel_img.update();
     Globals::edge_img.update();
 
+    Globals::scaledEdgeImage = Globals::edge_img;
+    Globals::scaledEdgeImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
+
     // ------------------- perform the scanning -----------------------
     if (Scanner::scanning)
     {
@@ -74,11 +73,9 @@ void ofApp::update()
         {
         case Absolute:
             Scanner::scan_absolute(Globals::edge_img.getPixels());
-            Scanner::scan_absolute(Globals::edge_img.getPixels()); // scan at twice the speed
             break;
         case Relative:
             Scanner::scan_relative(Globals::edge_img.getPixels());
-            Scanner::scan_relative(Globals::edge_img.getPixels()); // scan at twice the speed
             break;
 
         default:
@@ -101,23 +98,29 @@ void ofApp::draw()
     // draw images:
     ofSetColor(255);
 
-    switch (Controls::draw_mode)
+    if (IMAGE_SCALING != 1)
     {
-    case 1:
-        Globals::img.draw(0, 0);
-        break;
-    case 2:
-        Globals::grayImg.draw(0, 0);
-        break;
-    case 3:
-        Globals::sobel_img.draw(0, 0);
-        break;
-    case 4:
-        Globals::edge_img.draw(0, 0);
-        break;
-    default:
-        break;
+        Globals::scaledImage.draw(0,0);
+        Globals::scaledEdgeImage.draw(0,IMAGE_HEIGHT * IMAGE_SCALING);
     }
+    else
+        switch (Controls::draw_mode)
+        {
+        case 1:
+            Globals::img.draw(0, 0);
+            break;
+        case 2:
+            Globals::grayImg.draw(0, 0);
+            break;
+        case 3:
+            Globals::sobel_img.draw(0, 0);
+            break;
+        case 4:
+            Globals::edge_img.draw(0, 0);
+            break;
+        default:
+            break;
+        }
 
     // line detection:
     Mat mat = toCv(Globals::edge_img);

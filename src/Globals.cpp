@@ -10,7 +10,7 @@ ofxCvColorImage Globals::colorImg;
 ofxCvGrayscaleImage Globals::grayImg;
 
 // edge detection:
-ofImage Globals::img, Globals::edge_img, Globals::sobel_img;
+ofImage Globals::img, Globals::scaledImage, Globals::edge_img, Globals::scaledEdgeImage, Globals::sobel_img;
 
 //////////////////////////////// SCANNER //////////////////////////////
 Scan_Mode Scanner::scan_mode = Relative;
@@ -32,17 +32,35 @@ bool Scanner::do_draw_limits = true;
 // TODO: inverted color bar of original image; using shader?
 void Scanner::draw()
 {
+    float n = IMAGE_SCALING;
+
     ofSetColor(250);
     ofFill();
     ofSetLineWidth(1);
     switch (Scanner::scan_mode)
     {
     case Absolute:
-        ofDrawRectangle(ofRectangle(x_pos, 0, 3, 1080));
+        ofDrawRectangle(ofRectangle(x_pos * n, 0, 3, ofGetWindowHeight() * n));
+        // draw twice if scaling mode == 0.5:
+        if (IMAGE_SCALING == 0.5)
+        {
+            ofPushMatrix();
+            ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+            ofDrawRectangle(ofRectangle(x_pos * n, 0, 3, ofGetWindowHeight() * n));
+            ofPopMatrix();
+        }
         break;
 
     case Relative:
-        ofDrawRectangle(ofRectangle(x_pos, upperRidgeLimit, 3, lowerRidgeLimit - upperRidgeLimit));
+        ofDrawRectangle(ofRectangle(x_pos * n, upperRidgeLimit * n, 3, lowerRidgeLimit * n - upperRidgeLimit * n));
+        // draw twice if scaling mode == 0.5:
+        if (IMAGE_SCALING == 0.5)
+        {
+            ofPushMatrix();
+            ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+            ofDrawRectangle(ofRectangle(x_pos * n, upperRidgeLimit * n, 3, lowerRidgeLimit * n - upperRidgeLimit * n));
+            ofPopMatrix();
+        }
         break;
 
     default:
@@ -53,19 +71,52 @@ void Scanner::draw()
     ofSetColor(250, 20, 20);
     ofNoFill();
     ofSetLineWidth(3);
-    ofDrawRectangle(ofRectangle(x_pos - 5, whitePixelsAbsolute[x_pos] - 5, 10, 10));
+    ofDrawRectangle(ofRectangle(x_pos * n - 5, int(whitePixelsAbsolute[x_pos] * n) - 5, 10, 10));
+
+    // draw twice if scaling mode == 0.5:
+    if (IMAGE_SCALING == 0.5)
+    {
+        ofPushMatrix();
+        ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+        ofSetColor(250, 20, 20);
+        ofNoFill();
+        ofSetLineWidth(3);
+        ofDrawRectangle(ofRectangle(x_pos * n - 5, int(whitePixelsAbsolute[x_pos] * n) - 5, 10, 10));
+        ofPopMatrix();
+    }
 }
 
 // draw horizontal lines as limiters for white pixel detection:
 void Scanner::drawRidgeLimits()
 {
-    ofSetColor(250);
+    float n = IMAGE_SCALING;
+
     ofSetLineWidth(1);
 
-    ofDrawLine(0, upperRidgeLimit, ofGetWidth(), upperRidgeLimit);
-    ofDrawLine(0, lowerRidgeLimit, ofGetWidth(), lowerRidgeLimit);
+    // ridge limits (white)
+    ofSetColor(250);
+    ofDrawLine(0, upperRidgeLimit * n, ofGetWidth(), upperRidgeLimit * n);
+    ofDrawLine(0, lowerRidgeLimit * n, ofGetWidth(), lowerRidgeLimit * n);
+
+    // oscillation center (blue)
     ofSetColor(70, 20, 200);
-    ofDrawLine(0, oscillationCenter, ofGetWidth(), oscillationCenter);
+    ofDrawLine(0, oscillationCenter * n, ofGetWidth(), oscillationCenter * n);
+
+    // draw twice if scaling mode = 0.5
+    if (IMAGE_SCALING == 0.5)
+    {
+        ofPushMatrix();
+        ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+        // ridge limits (white)
+        ofSetColor(250);
+        ofDrawLine(0, upperRidgeLimit * n, ofGetWidth(), upperRidgeLimit * n);
+        ofDrawLine(0, lowerRidgeLimit * n, ofGetWidth(), lowerRidgeLimit * n);
+
+        // oscillation center (blue)
+        ofSetColor(70, 20, 200);
+        ofDrawLine(0, oscillationCenter * n, ofGetWidth(), oscillationCenter * n);
+        ofPopMatrix();
+    }
 }
 
 // just returns min and max values of white pixels within limits
@@ -110,82 +161,88 @@ void Scanner::getMinMax(ofPixels &pixels)
 // look for white pixels within limits in vertical bar:
 void Scanner::scan_absolute(ofPixels &pixels)
 {
-    x_pos = (x_pos + 1) % IMAGE_WIDTH;
-
-    static int previous_x_pos = 0;
-    if (x_pos != previous_x_pos)
+    for (int i = 0; i < SCANNING_SPEED; i++) // num of scans per frame
     {
-        float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
-        for (int y = 0; y < IMAGE_HEIGHT; y++)
+        x_pos = (x_pos + 1) % IMAGE_WIDTH;
+
+        static int previous_x_pos = 0;
+        if (x_pos != previous_x_pos)
         {
-            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
+            float y_out = oscillationCenter; // start at osc center --> will be default if no pixels found
+            for (int y = 0; y < IMAGE_HEIGHT; y++)
             {
-                y_out = 1 - (y / 1080.0);
-                // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+                if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
+                {
+                    y_out = 1 - (y / 1080.0);
+                    // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
 
-                // send data:
-                ofxOscMessage m;
-                m.setAddress("/rt_scan");
-                m.addFloatArg(x_pos);
-                m.addFloatArg(y_out);
-                Communication::sender.sendMessage(m, false);
+                    // send data:
+                    ofxOscMessage m;
+                    m.setAddress("/rt_scan");
+                    m.addFloatArg(x_pos);
+                    m.addFloatArg(y_out);
+                    Communication::sender.sendMessage(m, false);
+                }
             }
-        }
 
-        if (x_pos >= IMAGE_WIDTH - 1)
-        {
-            scan_iteration++;
-            if (Scanner::scan_iteration >= Scanner::maxIterations)
-                Controls::loadNextImage();
-        }
+            if (x_pos >= IMAGE_WIDTH - 1)
+            {
+                scan_iteration++;
+                if (Scanner::scan_iteration >= Scanner::maxIterations)
+                    Controls::loadNextImage();
+            }
 
-        previous_x_pos = x_pos;
+            previous_x_pos = x_pos;
+        }
     }
 }
 
 // converts white pixels within limits relative to oscillationCenter
 void Scanner::scan_relative(ofPixels &pixels)
 {
-    x_pos = (x_pos + 1) % IMAGE_WIDTH;
-
-    static int previous_x_pos = 0;
-    if (x_pos != previous_x_pos)
+    for (int i = 0; i < SCANNING_SPEED; i++) // num of scans per frame
     {
-        float y_out = 0;
-        for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
+        x_pos = (x_pos + 1) % IMAGE_WIDTH;
+
+        static int previous_x_pos = 0;
+        if (x_pos != previous_x_pos)
         {
-            if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
+            float y_out = 0;
+            for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
             {
-                if (y < oscillationCenter) // positive values above oscLine
+                if (pixels.getColor(x_pos, y) == ofColor(255, 255, 255))
                 {
-                    y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
+                    if (y < oscillationCenter) // positive values above oscLine
+                    {
+                        y_out = (Scanner::oscillationCenter - y) / float(Scanner::oscillationCenter - Scanner::ymin);
+                    }
+                    else if (y > oscillationCenter) // negative values below oscLine
+                    {
+                        y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
+                    }
+
+                    // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
+
+                    // send data:
+                    ofxOscMessage m;
+                    m.setAddress("/rt_scan");
+                    m.addFloatArg(x_pos);
+                    m.addFloatArg(y_out);
+                    Communication::sender.sendMessage(m, false);
+
+                    // ofLogNotice(ofToString(Scanner::x_pos) + " " + ofToString(Scanner::whitePixelsAbsolute[Scanner::x_pos]) + " " + ofToString(Scanner::ymin) + " " + ofToString(Scanner::oscillationCenter) + " " + ofToString(Scanner::ymax) + " " + ofToString(y_out));
                 }
-                else if (y > oscillationCenter) // negative values below oscLine
-                {
-                    y_out = (y - Scanner::oscillationCenter) / float(Scanner::ymax - Scanner::oscillationCenter) * -1;
-                }
-
-                // cout << "white pixel at: (" << x_pos << "|" << y_out << ")" << endl;
-
-                // send data:
-                ofxOscMessage m;
-                m.setAddress("/rt_scan");
-                m.addFloatArg(x_pos);
-                m.addFloatArg(y_out);
-                Communication::sender.sendMessage(m, false);
-
-                cout << Scanner::x_pos << " " << Scanner::whitePixelsAbsolute[Scanner::x_pos] << " " << Scanner::ymin << " " << Scanner::oscillationCenter << " " << Scanner::ymax << " " << y_out << endl;
             }
-        }
 
-        if (x_pos >= IMAGE_WIDTH - 1)
-        {
-            scan_iteration++;
-            if (Scanner::scan_iteration >= Scanner::maxIterations)
-                Controls::loadNextImage();
-        }
+            if (x_pos >= IMAGE_WIDTH - 1)
+            {
+                scan_iteration++;
+                if (Scanner::scan_iteration >= Scanner::maxIterations)
+                    Controls::loadNextImage();
+            }
 
-        previous_x_pos = x_pos;
+            previous_x_pos = x_pos;
+        }
     }
 }
 
@@ -259,10 +316,13 @@ vector<Vec4i> Controls::lines;
 void Controls::loadNextImage()
 {
     // images setup:
-    Globals::img_idx = (Globals::img_idx + 1) % NUM_OF_IMAGES;
+    Globals::img_idx = (Globals::img_idx + 1) % Globals::images.size();
 
     Globals::img.load(Globals::images.at(Globals::img_idx));
-    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT); // ATTENTION: IMAGE_WIDTH AND IMAGE_HEIGHT DO AFFECT THE SCANNING. TODO: RESIZE ONLY SHORTLY BEFORE DRAWING (USING ANOTHER INSTANCE)
+
+    Globals::scaledImage.loadImage(Globals::images.at(Globals::img_idx));
+    Globals::scaledImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
 
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());

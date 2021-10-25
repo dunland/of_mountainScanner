@@ -48,4 +48,6 @@ public:
     ofxIntSlider gui_lowerRidgeLimit; // lower limit for white pixel detection
 
     ofxToggle gui_scanModeButton;
+    bool gui_mouse_released = false;
+
 };

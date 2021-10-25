@@ -24,9 +24,10 @@ public:
     static int img_idx;
     static ofxCvColorImage colorImg;
     static ofxCvGrayscaleImage grayImg;
+    static ofImage img, scaledImage;
 
     // edge detection:
-    static ofImage img, edge_img, sobel_img;
+    static ofImage edge_img, scaledEdgeImage, sobel_img;
 };
 
 //////////////////////////////// SCANNER //////////////////////////////

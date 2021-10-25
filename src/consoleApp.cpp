@@ -62,38 +62,42 @@ void consoleApp::update()
 
     Scanner::scan_mode = (gui_scanModeButton) ? Relative : Absolute;
 
-    // ---------------- observe limits changes -----------------------
-    // TODO: use gui_lowerRidgeSlider.mouseReleased()
-    static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
-    if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
+    if (gui_mouse_released)
     {
-        Controls::doQuickScanNextUpdate = true;
-        prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
-        cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
-    }
+        // ---------------- observe limits changes -----------------------
+        // TODO: use gui_lowerRidgeSlider.mouseReleased()
+        static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+        if (prev_lowRidgeLimit != Scanner::lowerRidgeLimit)
+        {
+            Controls::doQuickScanNextUpdate = true;
+            prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
+            cout << "lowerRidgeLimit changed! new limit at " << Scanner::lowerRidgeLimit << " <-- ymax at" << Scanner::ymax << endl;
+        }
 
-    static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
-    if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
-    {
-        Controls::doQuickScanNextUpdate = true;
-        prev_highRidgeLimit = Scanner::upperRidgeLimit;
-        cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
-    }
+        static int prev_highRidgeLimit = Scanner::upperRidgeLimit;
+        if (prev_highRidgeLimit != Scanner::upperRidgeLimit)
+        {
+            Controls::doQuickScanNextUpdate = true;
+            prev_highRidgeLimit = Scanner::upperRidgeLimit;
+            cout << "upperRidgeLimit changed! new limit at " << Scanner::upperRidgeLimit << " <-- ymin at" << Scanner::ymin << endl;
+        }
 
-    static int prev_oscillationCenter = Scanner::oscillationCenter;
-    if (prev_oscillationCenter != Scanner::oscillationCenter)
-    {
-        Controls::doQuickScanNextUpdate = true;
-        prev_oscillationCenter = Scanner::oscillationCenter;
-        cout << "oscillationCenter changed! " << Scanner::oscillationCenter << " <-- oscillating at" << Scanner::oscillationCenter << endl;
-    }
+        static int prev_oscillationCenter = Scanner::oscillationCenter;
+        if (prev_oscillationCenter != Scanner::oscillationCenter)
+        {
+            Controls::doQuickScanNextUpdate = true;
+            prev_oscillationCenter = Scanner::oscillationCenter;
+            cout << "oscillationCenter changed! " << Scanner::oscillationCenter << " <-- oscillating at" << Scanner::oscillationCenter << endl;
+        }
 
-    static int prev_imgThreshold = Controls::img_thresholdLow;
-    if (prev_imgThreshold != Controls::img_thresholdLow)
-    {
-        Controls::doQuickScanNextUpdate = true;
-        prev_imgThreshold = Controls::img_thresholdLow;
-        cout << "img threshold changed! " << Controls::img_thresholdLow << " <-- now at" << Controls::img_thresholdLow << endl;
+        static int prev_imgThreshold = Controls::img_thresholdLow;
+        if (prev_imgThreshold != Controls::img_thresholdLow)
+        {
+            Controls::doQuickScanNextUpdate = true;
+            prev_imgThreshold = Controls::img_thresholdLow;
+            cout << "img threshold changed! " << Controls::img_thresholdLow << " <-- now at" << Controls::img_thresholdLow << endl;
+        }
+        gui_mouse_released = false;
     }
 
     // ------------------------ communication -------------------------
@@ -214,6 +218,7 @@ void consoleApp::mousePressed(int x, int y, int button)
 //--------------------------------------------------------------
 void consoleApp::mouseReleased(int x, int y, int button)
 {
+    gui_mouse_released = true;
 }
 
 //--------------------------------------------------------------
