@@ -12,3 +12,5 @@
 // send port
 #define SENDING_PORT 9002
 #define RECEIVING_PORT 9001
+
+#define PD_NUM_OF_CHARTS 3 // iterate through the number of charts to send data to
