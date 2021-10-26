@@ -19,6 +19,7 @@ void consoleApp::setup()
     gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
     gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
     gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
+    gui.add(gui_scanningSpeed.setup("scanning speed", SCANNING_SPEED, 1, 10));
     gui.add(gui_scanModeButton.setup("set scan mode", 8, 0, 15));
     gui.add(gui_send_button.setup("quickScan and send compiled data", 8, 0, 15));
     gui.setPosition(0, 120);
@@ -41,18 +42,19 @@ void consoleApp::update()
 {
     // update gui variables:
     Controls::img_thresholdLow = gui_imgThresholdLow;   // img threshold
-    Controls::img_thresholdHigh = gui_imgThresholdHigh; // img threshold
-    Controls::canny_1 = gui_canny_1;                    // img threshold
-    Controls::canny_2 = gui_canny_2;                    // img threshold
-    Controls::edgeThreshold = gui_edgeThreshold;        // line detection
-    Controls::lineThreshold = gui_lineThreshold;        // line detection
-    Controls::minLineLength = gui_minLineLength;        // line detection
-    Controls::maxLineGap = gui_maxLineGap;              // line detection
+    // Controls::img_thresholdHigh = gui_imgThresholdHigh; // img threshold
+    // Controls::canny_1 = gui_canny_1;                    // img threshold
+    // Controls::canny_2 = gui_canny_2;                    // img threshold
+    // Controls::edgeThreshold = gui_edgeThreshold;        // line detection
+    // Controls::lineThreshold = gui_lineThreshold;        // line detection
+    // Controls::minLineLength = gui_minLineLength;        // line detection
+    // Controls::maxLineGap = gui_maxLineGap;              // line detection
 
     // TODO: quickScan whenever one of these was changed (via gui.mouseRelease)
     Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
     Scanner::upperRidgeLimit = gui_upperRidgeLimit;     // upper scan area
     Scanner::lowerRidgeLimit = gui_lowerRidgeLimit;     // lower scan area
+    Scanner::scanning_speed = gui_scanningSpeed;
 
     if (gui_send_button)
     {

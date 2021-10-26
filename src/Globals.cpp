@@ -14,10 +14,7 @@ ofxCvGrayscaleImage Globals::grayImg;
 ofImage Globals::img, Globals::scaledImage, Globals::edge_img, Globals::scaledEdgeImage, Globals::sobel_img;
 
 //////////////////////////////// SCANNER //////////////////////////////
-Scan_Mode Scanner::scan_mode = Relative;
 bool Scanner::scanning = false;
-int Scanner::scan_iteration = 0;
-int Scanner::maxIterations = MAX_SCAN_ITERATIONS;
 int Scanner::whitePixelsAbsolute[IMAGE_WIDTH];
 
 int Scanner::x_pos = 0;
@@ -28,6 +25,12 @@ int Scanner::oscillationCenter = IMAGE_HEIGHT / 2;
 int Scanner::upperRidgeLimit = IMAGE_HEIGHT / 3;
 int Scanner::lowerRidgeLimit = IMAGE_HEIGHT * 3 / 4;
 bool Scanner::do_draw_limits = true;
+
+// behavior:
+Scan_Mode Scanner::scan_mode = Relative;
+int Scanner::scan_iteration = 0;
+int Scanner::maxIterations = MAX_SCAN_ITERATIONS;
+int Scanner::scanning_speed = SCANNING_SPEED;
 
 // draw vertical rectangle at scanner position
 // TODO: inverted color bar of original image; using shader?
@@ -162,7 +165,7 @@ void Scanner::getMinMax(ofPixels &pixels)
 // look for white pixels within limits in vertical bar:
 void Scanner::scan_absolute(ofPixels &pixels)
 {
-    for (int i = 0; i < SCANNING_SPEED; i++) // num of scans per frame
+    for (int i = 0; i < Scanner::scanning_speed; i++) // num of scans per frame
     {
         x_pos = (x_pos + 1) % IMAGE_WIDTH;
 
@@ -201,7 +204,7 @@ void Scanner::scan_absolute(ofPixels &pixels)
 // converts white pixels within limits relative to oscillationCenter
 void Scanner::scan_relative(ofPixels &pixels)
 {
-    for (int i = 0; i < SCANNING_SPEED; i++) // num of scans per frame
+    for (int i = 0; i < Scanner::scanning_speed; i++) // num of scans per frame
     {
         x_pos = (x_pos + 1) % IMAGE_WIDTH;
 

@@ -38,10 +38,7 @@ class Scanner
     Scanner();
 
 public:
-    static Scan_Mode scan_mode;
     static bool scanning;
-    static int scan_iteration;
-    static int maxIterations;
     static int whitePixelsAbsolute[IMAGE_WIDTH];
 
     static int x_pos; // current postion of the scanner
@@ -52,6 +49,12 @@ public:
     static int upperRidgeLimit; // upper limit for white pixel detection
     static int lowerRidgeLimit; // lower limit for white pixel detection
     static bool do_draw_limits;
+
+    // behavior:
+    static Scan_Mode scan_mode;
+    static int scan_iteration;
+    static int maxIterations;
+    static int scanning_speed;
 
     static void draw();
     static void drawRidgeLimits();               // draws limits for pixel detection and oscillation center line
