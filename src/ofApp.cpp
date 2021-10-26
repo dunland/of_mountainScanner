@@ -162,6 +162,7 @@ void ofApp::keyReleased(int key)
     {
         ofToggleFullscreen();
         Globals::image_scaling = (Globals::image_scaling == 0.5) ? 1 : 0.5;
+        Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
     }
     else if (key == '1')
     {

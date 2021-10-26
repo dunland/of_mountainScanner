@@ -4,7 +4,7 @@
 
 // scan controls:
 #define MAX_SCAN_ITERATIONS 1 // INFINITY if next image should only always be loaded manually
-#define SCANNING_SPEED 3      // defines how many times the scanning is conducted per frame // ATTENTION: THIS MIGHT AFFECT THE SOUND DESIGN!
+#define SCANNING_SPEED 1      // defines how many times the scanning is conducted per frame // ATTENTION: THIS MIGHT AFFECT THE SOUND DESIGN!
 
 // send host (aka ip address)
 #define HOST "localhost"
@@ -13,4 +13,4 @@
 #define SENDING_PORT 9002
 #define RECEIVING_PORT 9001
 
-#define PD_NUM_OF_CHARTS 3 // iterate through the number of charts to send data to
+#define PD_NUM_OF_CHARTS 1 // iterate through the number of charts to send data to
