@@ -251,10 +251,12 @@ void Scanner::scan_relative(ofPixels &pixels)
 }
 
 // -------------------------- QUICK SCANNING --------------------------
+// prepend image index as int, don't use it as message address
 void Scanner::quickScan_relative(ofPixels &pixels)
 {
     ofxOscMessage m;
-    m.setAddress("/quickScan/" + ofToString(Globals::img_idx % PD_NUM_OF_CHARTS));
+    m.setAddress("/quickScan");
+    m.addIntArg(Globals::img_idx % PD_NUM_OF_CHARTS); // send int as index first
 
     getMinMax(pixels);
 
@@ -287,9 +289,50 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     }
 
     // send data:
-    Communication::sender.sendMessage(m, false);
-    cout << "sent quickscan data: " << m << endl;
+    Communication::sender.sendMessage(m, false); // sends space-separated list of floats
+    ofLogNotice("sent quickscan data: " + ofToString(m));
 }
+
+// scanning without prepending index:
+// void Scanner::quickScan_relative(ofPixels &pixels)
+// {
+//     ofxOscMessage m;
+//     m.setAddress("/quickScan/" + ofToString(Globals::img_idx % PD_NUM_OF_CHARTS));
+
+//     getMinMax(pixels);
+
+//     for (int x = 0; x < IMAGE_WIDTH; x++)
+//         for (int y = 0; y < IMAGE_HEIGHT; y++)
+//             whitePixelsAbsolute[x] = oscillationCenter;
+
+//     for (int x = 0; x < IMAGE_WIDTH; x++)
+//     {
+//         float y_out = 0;
+//         for (int y = upperRidgeLimit; y < lowerRidgeLimit; y++)
+//         {
+//             if (pixels.getColor(x, y) == ofColor(255, 255, 255))
+//             {
+
+//                 if (y < oscillationCenter) // positive values above oscLine
+//                 {
+//                     y_out = (oscillationCenter - y) / float(oscillationCenter - ymin);
+//                 }
+//                 else if (y > oscillationCenter) // negative values below oscLine
+//                 {
+//                     y_out = (y - oscillationCenter) / float(ymax - oscillationCenter) * -1;
+//                 }
+
+//                 m.addFloatArg(y_out);
+//                 whitePixelsAbsolute[x] = y;
+//                 break; // if one y was found, go to next x // TODO: think about something better!
+//             }
+//         }
+//     }
+
+//     // send data:
+//     Communication::sender.sendMessage(m, false); // sends space-separated list of floats
+//     ofLogNotice("sent quickscan data: " + ofToString(m));
+// }
 
 //////////////////////////// COMMUNICATION ////////////////////////////
 ofxOscSender Communication::sender;
