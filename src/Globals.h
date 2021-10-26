@@ -22,6 +22,7 @@ public:
     // images:
     static vector<string> images;
     static int img_idx;
+    static float image_scaling;
     static ofxCvColorImage colorImg;
     static ofxCvGrayscaleImage grayImg;
     static ofImage img, scaledImage;

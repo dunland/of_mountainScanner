@@ -6,6 +6,7 @@
 // images:
 vector<string> Globals::images;
 int Globals::img_idx = 0;
+float Globals::image_scaling = IMAGE_SCALING;
 ofxCvColorImage Globals::colorImg;
 ofxCvGrayscaleImage Globals::grayImg;
 
@@ -32,7 +33,7 @@ bool Scanner::do_draw_limits = true;
 // TODO: inverted color bar of original image; using shader?
 void Scanner::draw()
 {
-    float n = IMAGE_SCALING;
+    float n = Globals::image_scaling;
 
     ofSetColor(250);
     ofFill();
@@ -42,10 +43,10 @@ void Scanner::draw()
     case Absolute:
         ofDrawRectangle(ofRectangle(x_pos * n, 0, 3, ofGetWindowHeight() * n));
         // draw twice if scaling mode == 0.5:
-        if (IMAGE_SCALING == 0.5)
+        if (Globals::image_scaling == 0.5)
         {
             ofPushMatrix();
-            ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+            ofTranslate(0, IMAGE_HEIGHT * Globals::image_scaling);
             ofDrawRectangle(ofRectangle(x_pos * n, 0, 3, ofGetWindowHeight() * n));
             ofPopMatrix();
         }
@@ -54,10 +55,10 @@ void Scanner::draw()
     case Relative:
         ofDrawRectangle(ofRectangle(x_pos * n, upperRidgeLimit * n, 3, lowerRidgeLimit * n - upperRidgeLimit * n));
         // draw twice if scaling mode == 0.5:
-        if (IMAGE_SCALING == 0.5)
+        if (Globals::image_scaling == 0.5)
         {
             ofPushMatrix();
-            ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+            ofTranslate(0, IMAGE_HEIGHT * Globals::image_scaling);
             ofDrawRectangle(ofRectangle(x_pos * n, upperRidgeLimit * n, 3, lowerRidgeLimit * n - upperRidgeLimit * n));
             ofPopMatrix();
         }
@@ -74,10 +75,10 @@ void Scanner::draw()
     ofDrawRectangle(ofRectangle(x_pos * n - 5, int(whitePixelsAbsolute[x_pos] * n) - 5, 10, 10));
 
     // draw twice if scaling mode == 0.5:
-    if (IMAGE_SCALING == 0.5)
+    if (Globals::image_scaling == 0.5)
     {
         ofPushMatrix();
-        ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+        ofTranslate(0, IMAGE_HEIGHT * Globals::image_scaling);
         ofSetColor(250, 20, 20);
         ofNoFill();
         ofSetLineWidth(3);
@@ -89,7 +90,7 @@ void Scanner::draw()
 // draw horizontal lines as limiters for white pixel detection:
 void Scanner::drawRidgeLimits()
 {
-    float n = IMAGE_SCALING;
+    float n = Globals::image_scaling;
 
     ofSetLineWidth(1);
 
@@ -103,10 +104,10 @@ void Scanner::drawRidgeLimits()
     ofDrawLine(0, oscillationCenter * n, ofGetWidth(), oscillationCenter * n);
 
     // draw twice if scaling mode = 0.5
-    if (IMAGE_SCALING == 0.5)
+    if (Globals::image_scaling == 0.5)
     {
         ofPushMatrix();
-        ofTranslate(0, IMAGE_HEIGHT * IMAGE_SCALING);
+        ofTranslate(0, IMAGE_HEIGHT * Globals::image_scaling);
         // ridge limits (white)
         ofSetColor(250);
         ofDrawLine(0, upperRidgeLimit * n, ofGetWidth(), upperRidgeLimit * n);
@@ -322,7 +323,7 @@ void Controls::loadNextImage()
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT); // ATTENTION: IMAGE_WIDTH AND IMAGE_HEIGHT DO AFFECT THE SCANNING. TODO: RESIZE ONLY SHORTLY BEFORE DRAWING (USING ANOTHER INSTANCE)
 
     Globals::scaledImage.loadImage(Globals::images.at(Globals::img_idx));
-    Globals::scaledImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
+    Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
     Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
     Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());

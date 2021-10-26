@@ -31,7 +31,7 @@ void ofApp::setup()
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     Globals::scaledImage.loadImage(Globals::images.at(Globals::img_idx));
-    Globals::scaledImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
+    Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
     Globals::colorImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
     Globals::grayImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -64,7 +64,7 @@ void ofApp::update()
     Globals::edge_img.update();
 
     Globals::scaledEdgeImage = Globals::edge_img;
-    Globals::scaledEdgeImage.resize(IMAGE_WIDTH * IMAGE_SCALING, IMAGE_HEIGHT * IMAGE_SCALING);
+    Globals::scaledEdgeImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
     // ------------------- perform the scanning -----------------------
     if (Scanner::scanning)
@@ -98,10 +98,10 @@ void ofApp::draw()
     // draw images:
     ofSetColor(255);
 
-    if (IMAGE_SCALING != 1)
+    if (Globals::image_scaling != 1)
     {
         Globals::scaledImage.draw(0,0);
-        Globals::scaledEdgeImage.draw(0,IMAGE_HEIGHT * IMAGE_SCALING);
+        Globals::scaledEdgeImage.draw(0,IMAGE_HEIGHT * Globals::image_scaling);
     }
     else
         switch (Controls::draw_mode)
@@ -161,6 +161,7 @@ void ofApp::keyReleased(int key)
     if (key == 'f')
     {
         ofToggleFullscreen();
+        Globals::image_scaling = (Globals::image_scaling == 0.5) ? 1 : 0.5;
     }
     else if (key == '1')
     {
