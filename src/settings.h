@@ -4,7 +4,7 @@
 
 // scan controls:
 #define MAX_SCAN_ITERATIONS 1 // INFINITY if next image should only always be loaded manually
-#define SCANNING_SPEED 10      // defines how many times the scanning is conducted per frame // ATTENTION: THIS MIGHT AFFECT THE SOUND DESIGN!
+#define SCANNING_SPEED 2      // defines how many times the scanning is conducted per frame // ATTENTION: THIS MIGHT AFFECT THE SOUND DESIGN!
 
 // send host (aka ip address)
 #define HOST "localhost"
