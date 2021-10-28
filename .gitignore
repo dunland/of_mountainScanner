@@ -34,6 +34,7 @@
 # Media
 *.jpg
 *.JPG
+*.wav
 
 # Environment
 *.vscode

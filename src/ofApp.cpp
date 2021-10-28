@@ -15,7 +15,7 @@ using namespace cv;
 ////////////////////////////////// SETUP //////////////////////////////
 void ofApp::setup()
 {
-    ofSetWindowTitle("ofApp");
+    ofSetWindowTitle("mountainScanner");
 
     ofSetVerticalSync(true);
 
