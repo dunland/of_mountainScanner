@@ -1,5 +1,5 @@
-#define IMAGE_WIDTH 1920
-#define IMAGE_HEIGHT 1080
+#define IMAGE_WIDTH 1920 // 4928
+#define IMAGE_HEIGHT 1080 // 3264
 #define IMAGE_SCALING 0.5 // float between 0 and 1
 
 // scan controls:

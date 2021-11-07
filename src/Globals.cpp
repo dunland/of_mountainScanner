@@ -28,6 +28,7 @@ bool Scanner::do_draw_limits = true;
 
 // behavior:
 Scan_Mode Scanner::scan_mode = Relative;
+MinMaxMode Scanner::min_max_mode = Limits;
 int Scanner::scan_iteration = 0;
 int Scanner::maxIterations = MAX_SCAN_ITERATIONS;
 int Scanner::scanning_speed = SCANNING_SPEED;
@@ -128,37 +129,50 @@ void Scanner::getMinMax(ofPixels &pixels)
 {
     ymin = IMAGE_HEIGHT;
     ymax = 0;
-    // get ymin and ymax for each x:
-    for (int x = 0; x < IMAGE_WIDTH; x++)
+
+    switch (min_max_mode)
     {
-        for (int y = 0; y < IMAGE_HEIGHT; y++)
+    case Normalized:
+        // get ymin and ymax for each x:
+        for (int x = 0; x < IMAGE_WIDTH; x++)
         {
-            if (pixels.getColor(x, y) == ofColor(255, 255, 255))
+            for (int y = 0; y < IMAGE_HEIGHT; y++)
             {
-                switch (Scanner::scan_mode)
+                if (pixels.getColor(x, y) == ofColor(255, 255, 255))
                 {
-                case Relative:
-                    if (y >= upperRidgeLimit && y <= lowerRidgeLimit)
+                    switch (Scanner::scan_mode)
                     {
+                    case Relative:
+                        if (y >= upperRidgeLimit && y <= lowerRidgeLimit)
+                        {
+                            if (y < ymin)
+                                ymin = y;
+                            if (y > ymax)
+                                ymax = y;
+                        }
+                        break;
+
+                    case Absolute:
                         if (y < ymin)
                             ymin = y;
                         if (y > ymax)
                             ymax = y;
+                        break;
+
+                    default:
+                        break;
                     }
-                    break;
-
-                case Absolute:
-                    if (y < ymin)
-                        ymin = y;
-                    if (y > ymax)
-                        ymax = y;
-                    break;
-
-                default:
-                    break;
                 }
             }
         }
+        break;
+
+    case Limits:
+        ymin = upperRidgeLimit;
+        ymax = lowerRidgeLimit;
+
+    default:
+        break;
     }
 }
 

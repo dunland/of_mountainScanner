@@ -16,6 +16,12 @@ enum Scan_Mode
     Relative = 1
 };
 
+enum MinMaxMode
+{
+    Limits = 0,    // upper and lower ridge limits are min and max; no normalization
+    Normalized = 1 // get highest and lowest mountain peaks within limits
+};
+
 class Globals
 {
 public:
@@ -52,6 +58,7 @@ public:
 
     // behavior:
     static Scan_Mode scan_mode;
+    static MinMaxMode min_max_mode;
     static int scan_iteration;
     static int maxIterations;
     static int scanning_speed;
