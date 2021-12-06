@@ -8,6 +8,7 @@ Settings, like number of scans until  are to be set in settings.h
 
 #include "ofApp.h"
 #include "Globals.h"
+#include "Scanner.h"
 
 using namespace ofxCv;
 using namespace cv;
@@ -25,12 +26,17 @@ void ofApp::setup()
     dir.listDir();
     dir = dir.getSorted();
     for (int i = 0; i < dir.size(); i++)
-        Globals::images.push_back(dir.getPath(i));
+    {
+        Globals::imagePaths.push_back(dir.getPath(i));
 
-    Globals::img.loadImage(Globals::images.at(Globals::img_idx));
+    }
+
+    Globals::img.load(Globals::imagePaths.at(Globals::img_idx));
+    Globals::nextImg.load(Globals::imagePaths.at((Globals::img_idx + 1) % Globals::imagePaths.size())); // load next image already
+
     Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    Globals::scaledImage.loadImage(Globals::images.at(Globals::img_idx));
+    Globals::scaledImage.load(Globals::imagePaths.at(Globals::img_idx));
     Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
     Globals::colorImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -91,9 +97,9 @@ void ofApp::update()
 
     for (int i = 0; i < Globals::circles.size(); i++)
     {
-        Globals::circles[i]->update_radius();
+        Globals::circles[i]->update_radius(Globals::circleShrinkSpeed);
         if (Globals::circles[i]->bKillMe)
-        Globals::circles.erase(Globals::circles.begin() + i);
+            Globals::circles.erase(Globals::circles.begin() + i);
     }
 }
 
@@ -126,6 +132,7 @@ void ofApp::draw()
             Globals::edge_img.draw(0, 0);
             break;
         default:
+            // draw none
             break;
         }
 
@@ -151,14 +158,15 @@ void ofApp::draw()
         }
     }
 
-    Scanner::draw();
+    if (Scanner::do_draw)
+        Scanner::draw();
 
     if (Scanner::do_draw_limits)
         Scanner::drawRidgeLimits();
 
     for (int i = 0; i < Globals::circles.size(); i++)
     {
-        Globals::circles[i]->draw();
+        Globals::circles[i]->draw(Globals::circlesFlyOff);
     }
 }
 
@@ -196,6 +204,10 @@ void ofApp::keyReleased(int key)
     {
         Controls::draw_mode = 0;
     }
+    else if (key == '5')
+    {
+        Controls::draw_mode = -1; // draw none
+    }
 
     else if (key == 'c')
     {
@@ -209,6 +221,9 @@ void ofApp::keyReleased(int key)
 
     else if (key == 'l')
         Scanner::do_draw_limits = !Scanner::do_draw_limits;
+
+    else if (key == 's')
+        Scanner::do_draw = !Scanner::do_draw;
 
     else if (key == ' ')
     {

@@ -7,10 +7,11 @@ class Circle
 {
 public:
 
-    Circle(int x_pos, int y_pos)
+    Circle(int x_pos, int y_pos, float radius_)
     {
         xpos = x_pos;
         ypos = y_pos;
+        radius = radius_;
     }
 
 
@@ -18,7 +19,11 @@ public:
     float radius = CIRCLES_CREATION_STEP;
     bool bKillMe = false;
 
-    void draw();
+    void draw(bool circlesFlyOff);
 
-    void update_radius();
+    void update_radius(float shrinkSpeed);
+
+    ~Circle(){
+        delete(this);
+    }
 };

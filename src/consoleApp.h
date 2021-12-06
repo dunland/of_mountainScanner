@@ -26,6 +26,7 @@ public:
     void gotMessage(ofMessage msg);
 
     // TODO: global GUI, keine doppelten Variablen
+    bool gui_mouse_released = false;
 
     ofxPanel gui;
     ofxIntSlider gui_imgThresholdLow;
@@ -33,7 +34,6 @@ public:
 
     // hough lines:
     ofxIntSlider gui_edgeThreshold;
-    ofxIntSlider gui_oscillationCenter;
     ofxIntSlider gui_lineThreshold;
     ofxIntSlider gui_minLineLength;
     ofxIntSlider gui_maxLineGap;
@@ -43,12 +43,18 @@ public:
     ofxIntSlider gui_canny_2;
 
     // Scanning
-    ofxIntSlider gui_scanningSpeed;
-    ofxToggle gui_send_button;
-    ofxIntSlider gui_upperRidgeLimit; // upper limit for white pixel detection
-    ofxIntSlider gui_lowerRidgeLimit; // lower limit for white pixel detection
+    ofxPanel scannerGui;
+    ofxIntSlider scanner_scanningSpeed;
+    ofxToggle scanner_send_button;
+    ofxIntSlider scanner_oscillationCenter;
+    ofxIntSlider scanner_upperRidgeLimit; // upper limit for white pixel detection
+    ofxIntSlider scanner_lowerRidgeLimit; // lower limit for white pixel detection
 
-    ofxToggle gui_scanModeButton;
-    bool gui_mouse_released = false;
+    ofxToggle scanner_scanModeButton;
+    
 
+    ofxPanel circlesGui;
+    ofxIntSlider circlesCreationStep;
+    ofxFloatSlider circlesShrinkSpeed;
+    ofxToggle circlesFlyOff;
 };

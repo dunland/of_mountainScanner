@@ -16,5 +16,5 @@
 #define PD_NUM_OF_CHARTS 101 // iterate through the number of charts to send data to
 
 // circles:
-#define CIRCLES_CREATION_STEP 5
-#define CIRCLES_SHRINK_SPEED 0.01
+#define CIRCLES_CREATION_STEP 2 // also determines the circle radii
+#define CIRCLES_SHRINK_SPEED 0.0

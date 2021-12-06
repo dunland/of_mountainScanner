@@ -1,12 +1,15 @@
 #include "consoleApp.h"
 #include <iostream>
 #include "Globals.h"
+#include "Scanner.h"
 
 //--------------------------------------------------------------
 void consoleApp::setup()
 {
     ofSetWindowTitle("consoleApp");
 
+    // ------------------------ gui setup -----------------------------
+    // image settings:
     gui.setup();
     gui.add(gui_imgThresholdLow.setup("Image Low Threshold", 113, 0, 255));
     // gui.add(gui_imgThresholdHigh.setup("Image High Threshold", 0, 0, 1));
@@ -16,15 +19,25 @@ void consoleApp::setup()
     // gui.add(gui_lineThreshold.setup("Line Threshold", 0, 0, 200));
     // gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
     // gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
-    gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
-    gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
-    gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
-    gui.add(gui_scanningSpeed.setup("scanning speed", SCANNING_SPEED, 1, 10));
-    gui.add(gui_scanModeButton.setup("set scan mode", 8, 0, 15));
-    gui.add(gui_send_button.setup("quickScan and send compiled data", 8, 0, 15));
     gui.setPosition(0, 120);
 
-    // communication with Pd
+    // slider settings gui:
+    scannerGui.setup();
+    scannerGui.add(scanner_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
+    scannerGui.add(scanner_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
+    scannerGui.add(scanner_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
+    scannerGui.add(scanner_scanningSpeed.setup("scanning speed", SCANNING_SPEED, 1, 10));
+    scannerGui.add(scanner_scanModeButton.setup("set scan mode", 8, 0, 15));
+    scannerGui.add(scanner_send_button.setup("quickScan and send compiled data", 8, 0, 15));
+    scannerGui.setPosition(0, 160);
+
+    circlesGui.setup();
+    circlesGui.add(circlesCreationStep.setup("circles creation step", CIRCLES_CREATION_STEP, 1, 10));
+    circlesGui.add(circlesShrinkSpeed.setup("circles shrink speed", CIRCLES_SHRINK_SPEED, 0, 0.1));
+    circlesGui.add(circlesFlyOff.setup("circles fly off", false));
+    circlesGui.setPosition(0, 300);
+
+    // -------------------- communication with Pd ---------------------
     Communication::sender.setup(HOST, SENDING_PORT);
     // send 1 to activate udp:
     ofxOscMessage m;
@@ -41,7 +54,7 @@ void consoleApp::setup()
 void consoleApp::update()
 {
     // update gui variables:
-    Controls::img_thresholdLow = gui_imgThresholdLow;   // img threshold
+    Controls::img_thresholdLow = gui_imgThresholdLow; // img threshold
     // Controls::img_thresholdHigh = gui_imgThresholdHigh; // img threshold
     // Controls::canny_1 = gui_canny_1;                    // img threshold
     // Controls::canny_2 = gui_canny_2;                    // img threshold
@@ -51,18 +64,22 @@ void consoleApp::update()
     // Controls::maxLineGap = gui_maxLineGap;              // line detection
 
     // TODO: quickScan whenever one of these was changed (via gui.mouseRelease)
-    Scanner::oscillationCenter = gui_oscillationCenter; // upper scan area
-    Scanner::upperRidgeLimit = gui_upperRidgeLimit;     // upper scan area
-    Scanner::lowerRidgeLimit = gui_lowerRidgeLimit;     // lower scan area
-    Scanner::scanning_speed = gui_scanningSpeed;
+    Scanner::oscillationCenter = scanner_oscillationCenter; // upper scan area
+    Scanner::upperRidgeLimit = scanner_upperRidgeLimit;     // upper scan area
+    Scanner::lowerRidgeLimit = scanner_lowerRidgeLimit;     // lower scan area
+    Scanner::scanning_speed = scanner_scanningSpeed;
+    
+    Globals::circleShrinkSpeed = circlesShrinkSpeed;
+    Globals::circlesCreationStep = circlesCreationStep;
+    Globals::circlesFlyOff = circlesFlyOff;
 
-    if (gui_send_button)
+    if (scanner_send_button)
     {
         Scanner::quickScan_relative(Globals::edge_img.getPixels());
-        gui_send_button = false;
+        scanner_send_button = false;
     }
 
-    Scanner::scan_mode = (gui_scanModeButton) ? Relative : Absolute;
+    Scanner::scan_mode = (scanner_scanModeButton) ? Relative : Absolute;
 
     if (gui_mouse_released)
     {
@@ -143,10 +160,12 @@ void consoleApp::draw()
         ofDrawBitmapString(scanModeStr, 20, 90);
     }
 
-    string currentImgStr = "image: " + Globals::images[Globals::img_idx];
+    string currentImgStr = "image: " + Globals::imagePaths[Globals::img_idx];
     ofDrawBitmapString(currentImgStr, 20, 110);
 
     gui.draw();
+    scannerGui.draw();
+    circlesGui.draw();
 }
 
 //--------------------------------------------------------------
