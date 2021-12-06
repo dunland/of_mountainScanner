@@ -14,3 +14,7 @@
 #define RECEIVING_PORT 9001
 
 #define PD_NUM_OF_CHARTS 101 // iterate through the number of charts to send data to
+
+// circles:
+#define CIRCLES_CREATION_STEP 5
+#define CIRCLES_SHRINK_SPEED 0.01

@@ -6,6 +6,7 @@
 #include "ofxGui.h"
 #include "settings.h"
 #include "ofxOsc.h"
+#include "Circles.h"
 
 using namespace cv;
 using namespace ofxCv;
@@ -35,6 +36,9 @@ public:
 
     // edge detection:
     static ofImage edge_img, scaledEdgeImage, sobel_img;
+
+    // circles:
+    static vector<Circle*> circles;
 };
 
 //////////////////////////////// SCANNER //////////////////////////////

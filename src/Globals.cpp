@@ -13,6 +13,9 @@ ofxCvGrayscaleImage Globals::grayImg;
 // edge detection:
 ofImage Globals::img, Globals::scaledImage, Globals::edge_img, Globals::scaledEdgeImage, Globals::sobel_img;
 
+// circles:
+vector<Circle*> Globals::circles;
+
 //////////////////////////////// SCANNER //////////////////////////////
 bool Scanner::scanning = false;
 int Scanner::whitePixelsAbsolute[IMAGE_WIDTH];
@@ -89,6 +92,10 @@ void Scanner::draw()
         ofDrawRectangle(ofRectangle(x_pos * n - 5, int(whitePixelsAbsolute[x_pos] * n) - 5, 10, 10));
         ofPopMatrix();
     }
+
+    // circle creation:
+    if (x_pos % CIRCLES_CREATION_STEP == 0)
+        Globals::circles.push_back(new Circle(x_pos, int(whitePixelsAbsolute[x_pos])));
 }
 
 // draw horizontal lines as limiters for white pixel detection:

@@ -88,6 +88,13 @@ void ofApp::update()
         Scanner::quickScan_relative(Globals::edge_img.getPixels());
         Controls::doQuickScanNextUpdate = false;
     }
+
+    for (int i = 0; i < Globals::circles.size(); i++)
+    {
+        Globals::circles[i]->update_radius();
+        if (Globals::circles[i]->bKillMe)
+        Globals::circles.erase(Globals::circles.begin() + i);
+    }
 }
 
 /////////////////////////////////// DRAW //////////////////////////////
@@ -100,8 +107,8 @@ void ofApp::draw()
 
     if (Globals::image_scaling != 1)
     {
-        Globals::scaledImage.draw(0,0);
-        Globals::scaledEdgeImage.draw(0,IMAGE_HEIGHT * Globals::image_scaling);
+        Globals::scaledImage.draw(0, 0);
+        Globals::scaledEdgeImage.draw(0, IMAGE_HEIGHT * Globals::image_scaling);
     }
     else
         switch (Controls::draw_mode)
@@ -148,6 +155,11 @@ void ofApp::draw()
 
     if (Scanner::do_draw_limits)
         Scanner::drawRidgeLimits();
+
+    for (int i = 0; i < Globals::circles.size(); i++)
+    {
+        Globals::circles[i]->draw();
+    }
 }
 
 //--------------------------------------------------------------
