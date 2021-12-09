@@ -20,6 +20,8 @@ void ofApp::setup()
 
     ofSetVerticalSync(true);
 
+    ofSetCircleResolution(20); // TODO: linien statt punkte
+
     // setup images
     ofDirectory dir(""); // read folder ./bin/data
     dir.allowExt("jpg");
@@ -27,21 +29,23 @@ void ofApp::setup()
     dir = dir.getSorted();
     for (int i = 0; i < dir.size(); i++)
     {
-        Globals::imagePaths.push_back(dir.getPath(i));
-
+        Globals::imagePaths.push_back(dir.getPath(i)); // TODO: alle Bilder anfangs laden!
+        ofImage *img = new ofImage();
+        img->load(dir.getPath(i));
+        Globals::images.push_back(img);
     }
 
-    Globals::img.load(Globals::imagePaths.at(Globals::img_idx));
-    Globals::nextImg.load(Globals::imagePaths.at((Globals::img_idx + 1) % Globals::imagePaths.size())); // load next image already
+    Globals::img = Globals::images[Globals::img_idx];
+    // Globals::nextImg.load(Globals::imagePaths.at((Globals::img_idx + 1) % Globals::imagePaths.size())); // load next image already
 
-    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    Globals::img->resize(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     Globals::scaledImage.load(Globals::imagePaths.at(Globals::img_idx));
     Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
     Globals::colorImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
     Globals::grayImg.allocate(IMAGE_WIDTH, IMAGE_HEIGHT);
-    Globals::colorImg.setFromPixels(Globals::img.getPixels());
+    Globals::colorImg.setFromPixels(Globals::img->getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
     Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
 
@@ -120,7 +124,7 @@ void ofApp::draw()
         switch (Controls::draw_mode)
         {
         case 1:
-            Globals::img.draw(0, 0);
+            Globals::img->draw(0, 0);
             break;
         case 2:
             Globals::grayImg.draw(0, 0);

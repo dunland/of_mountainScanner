@@ -16,11 +16,13 @@ class Globals
 public:
     // images:
     static vector<string> imagePaths;
+    static vector<ofImage *> images;
     static int img_idx;
     static float image_scaling;
     static ofxCvColorImage colorImg;
     static ofxCvGrayscaleImage grayImg;
-    static ofImage img, nextImg, scaledImage;
+    static ofImage scaledImage;
+    static ofImage *img;
 
     // edge detection:
     static ofImage edge_img, scaledEdgeImage, sobel_img;

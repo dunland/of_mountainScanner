@@ -6,13 +6,15 @@
 
 // images:
 vector<string> Globals::imagePaths;
+vector<ofImage *> Globals::images;
 int Globals::img_idx = 0;
 float Globals::image_scaling = IMAGE_SCALING;
 ofxCvColorImage Globals::colorImg;
 ofxCvGrayscaleImage Globals::grayImg;
 
 // edge detection:
-ofImage Globals::img, Globals::nextImg, Globals::scaledImage, Globals::edge_img, Globals::scaledEdgeImage, Globals::sobel_img;
+ofImage Globals::scaledImage, Globals::edge_img, Globals::scaledEdgeImage, Globals::sobel_img;
+ofImage * Globals::img;
 
 // circles:
 vector<Circle *> Globals::circles;
@@ -49,19 +51,18 @@ vector<Vec4i> Controls::lines;
 void Controls::loadNextImage()
 {
     // images setup:
-    Globals::img_idx = (Globals::img_idx + 1) % Globals::imagePaths.size();
+    Globals::img_idx = (Globals::img_idx + 1) % Globals::images.size();
 
-    Globals::img = Globals::nextImg;                                // load image
-    Globals::nextImg.load(Globals::imagePaths.at((Globals::img_idx + 1) % Globals::imagePaths.size())); // load next image already
-    Globals::img.resize(IMAGE_WIDTH, IMAGE_HEIGHT);                                         // ATTENTION: IMAGE_WIDTH AND IMAGE_HEIGHT DO AFFECT THE SCANNING. TODO: RESIZE ONLY SHORTLY BEFORE DRAWING (USING ANOTHER INSTANCE)
+    Globals::img = Globals::images[Globals::img_idx];                                // load image
+    Globals::img->resize(IMAGE_WIDTH, IMAGE_HEIGHT);                                         // ATTENTION: IMAGE_WIDTH AND IMAGE_HEIGHT DO AFFECT THE SCANNING. TODO: RESIZE ONLY SHORTLY BEFORE DRAWING (USING ANOTHER INSTANCE)
 
     Globals::scaledImage.loadImage(Globals::imagePaths.at(Globals::img_idx));
     Globals::scaledImage.resize(IMAGE_WIDTH * Globals::image_scaling, IMAGE_HEIGHT * Globals::image_scaling);
 
-    Globals::colorImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
-    Globals::grayImg.allocate(Globals::img.getWidth(), Globals::img.getHeight());
+    Globals::colorImg.allocate(Globals::img->getWidth(), Globals::img->getHeight());
+    Globals::grayImg.allocate(Globals::img->getWidth(), Globals::img->getHeight());
 
-    Globals::colorImg.setFromPixels(Globals::img.getPixels());
+    Globals::colorImg.setFromPixels(Globals::img->getPixels());
     Globals::colorImg.convertToGrayscalePlanarImage(Globals::grayImg, 0);
     Globals::grayImg.threshold(Controls::img_thresholdLow, Controls::img_thresholdHigh);
 
