@@ -162,8 +162,7 @@ void ofApp::draw()
         }
     }
 
-    if (Scanner::do_draw)
-        Scanner::draw();
+    Scanner::draw();
 
     if (Scanner::do_draw_limits)
         Scanner::drawRidgeLimits();

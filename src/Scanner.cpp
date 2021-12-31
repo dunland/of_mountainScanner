@@ -33,6 +33,7 @@ void Scanner::draw()
     ofFill();
     ofSetLineWidth(1);
     if (do_draw)
+    {
         switch (Scanner::scan_mode)
         {
         case Absolute:
@@ -60,6 +61,7 @@ void Scanner::draw()
         default:
             break;
         }
+    }
 
     // rectangle at scanning point:
     ofSetColor(250, 20, 20);
@@ -68,11 +70,11 @@ void Scanner::draw()
     ofDrawRectangle(ofRectangle(x_pos * n - 5, int(whitePixelsAbsolute[x_pos] * n) - 5, 10, 10));
 
     // circle creation:
-    if (x_pos % Globals::circlesCreationStep == 0)
+    if (x_pos % Globals::circlesCreationStep == 0 && scanning)
         Globals::circles.push_back(new Circle(x_pos, int(whitePixelsAbsolute[x_pos]), Globals::circlesCreationStep));
 
     // draw twice if scaling mode == 0.5:
-    if (Globals::image_scaling == 0.5)
+    if (Globals::image_scaling == 0.5 && scanning)
     {
         ofPushMatrix();
         ofTranslate(0, IMAGE_HEIGHT * Globals::image_scaling);
