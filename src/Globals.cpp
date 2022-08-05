@@ -274,6 +274,8 @@ void Scanner::quickScan_relative(ofPixels &pixels)
 
     getMinMax(pixels);
 
+    float output_list[IMAGE_WIDTH]; // for csv export
+
     for (int x = 0; x < IMAGE_WIDTH; x++)
         for (int y = 0; y < IMAGE_HEIGHT; y++)
             whitePixelsAbsolute[x] = oscillationCenter;
@@ -297,6 +299,9 @@ void Scanner::quickScan_relative(ofPixels &pixels)
 
                 m.addFloatArg(y_out);
                 whitePixelsAbsolute[x] = y;
+
+                output_list[x] = y_out;
+
                 break; // if one y was found, go to next x // TODO: think about something better!
             }
         }
@@ -305,6 +310,23 @@ void Scanner::quickScan_relative(ofPixels &pixels)
     // send data:
     Communication::sender.sendMessage(m, false); // sends space-separated list of floats
     ofLogNotice("sent quickscan data: " + ofToString(m));
+
+    // export to csv:
+    ofFile quickscan_data;
+    quickscan_data.open("ridge_" + Globals::images.at(Globals::img_idx) + ".csv", ofFile::WriteOnly);
+
+    string output_list_string = "";
+    for (int i = 0; i < IMAGE_WIDTH; i++)
+    {
+        output_list_string += ofToString(output_list[i]);
+
+        if (i < IMAGE_WIDTH - 1)
+            output_list_string += ",\n";
+        else
+            output_list_string += "\n";
+    }
+
+    quickscan_data << ofToString(output_list_string);
 }
 
 // scanning without prepending index:
