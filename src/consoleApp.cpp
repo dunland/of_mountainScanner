@@ -17,6 +17,7 @@ void consoleApp::setup()
     // gui.add(gui_minLineLength.setup("min line length", 0, 0, 15));
     // gui.add(gui_maxLineGap.setup("max line gap", 20, 0, 20));
     gui.add(gui_upperRidgeLimit.setup("upper ridge limit", IMAGE_HEIGHT / 4, 0, IMAGE_HEIGHT));
+    // gui_upperRidgeLimit.addListener(this, &consoleApp::setQuickScanNextUpdate);
     gui.add(gui_oscillationCenter.setup("oscillation center", IMAGE_HEIGHT / 2, 0, IMAGE_HEIGHT));
     gui.add(gui_lowerRidgeLimit.setup("lower ridge limit", IMAGE_HEIGHT * 3 / 4, IMAGE_HEIGHT, 0));
     gui.add(gui_scanningSpeed.setup("scanning speed", SCANNING_SPEED, 1, 10));
@@ -64,8 +65,9 @@ void consoleApp::update()
 
     Scanner::scan_mode = (gui_scanModeButton) ? Relative : Absolute;
 
-    if (gui_mouse_released)
-    {
+
+    // if (gui_mouse_released)
+    // {
         // ---------------- observe limits changes -----------------------
         // TODO: use gui_lowerRidgeSlider.mouseReleased()
         static int prev_lowRidgeLimit = Scanner::lowerRidgeLimit;
@@ -100,7 +102,7 @@ void consoleApp::update()
             cout << "img threshold changed! " << Controls::img_thresholdLow << " <-- now at" << Controls::img_thresholdLow << endl;
         }
         gui_mouse_released = false;
-    }
+    // }
 
     // ------------------------ communication -------------------------
     // ofxOscMessage incoming_message;
@@ -246,4 +248,10 @@ void consoleApp::gotMessage(ofMessage msg)
 //--------------------------------------------------------------
 void consoleApp::dragEvent(ofDragInfo dragInfo)
 {
+}
+
+//--------------------------------------------------------------
+void consoleApp::setQuickScanNextUpdate()
+{
+    Controls::doQuickScanNextUpdate = true;
 }
