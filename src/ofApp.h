@@ -33,4 +33,8 @@ public:
 	Mat imgMatGray;
 	Mat img_edgeMat;
 	Mat img_frameMat;
+
+	// communicatoin:
+	ofxOscReceiver receiver;
+	// int midiParams[128];
 };

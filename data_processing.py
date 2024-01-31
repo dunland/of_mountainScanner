@@ -1,6 +1,11 @@
-from lib2to3.pytree import convert
+'''
+non-destructive script to read all produced csv files of the images and plot it. It also translates the data to 16-bit and 256 samples to be handled by the Frantasia synth.
+author: @dunland
+'''
+
 import os
 import pandas
+import numpy
 import matplotlib.pyplot as plt
 
 print(os.getcwd())
@@ -9,10 +14,11 @@ path_of_files = "bin/data/"
 
 results = []  # list of csvs
 names = []  # names of the files
-mountain_name = "Crni Vrh" # name of mountain ridge
+mountain_name = "desconocido" # name of mountain ridge
 
 for root, dirs, files in sorted(os.walk(path_of_files)):
     for name in files:
+        print(name)
         if name.__contains__(".csv"):
             results.append(pandas.read_csv(os.path.join(os.getcwd(), root, name), header=None)[0])
             names.append(name)
@@ -22,7 +28,7 @@ i = 0
 for df in results:
     sample = int(df.shape[0]) / 256  # num of rows / 256 = samples
     df = df.iloc[::int(sample)].iloc[:256].reset_index()
-    df = df[0] * 32768
+    df = df[0] * 32767  # conversion to 16-bit
     results[i] = df
 
     # export df as csv:
@@ -31,7 +37,8 @@ for df in results:
     # export df as string to txt:
     val_list = ""
     for val in df:
-        val_list += (str(int(val)) + ", ")
+        if not numpy.isnan(val):
+            val_list += (str(int(val)) + ", ")
 
     val_list = val_list[:-2]  # remove last comma
     text_file = open("export/" + names[i][:-4] + "_16bit.txt", 'w')
@@ -39,6 +46,10 @@ for df in results:
     text_file.close()
 
     i += 1
+
+if len(results) <= 0:
+    print("no csv files found in", os.path.abspath(path_of_files))
+    quit()
 
 # all graphs in one plot:
 i = 0

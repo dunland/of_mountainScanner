@@ -46,6 +46,45 @@ void ofApp::setup()
 void ofApp::update()
 {
 
+ // OSC (via nanokorg) --------------------------------------
+    static int channel;
+    static int value;
+    while (receiver.hasWaitingMessages())
+    {
+        ofxOscMessage message;
+        receiver.getNextMessage(message);
+
+        if (message.getAddress() == "/midi/channel/")
+        {
+            ofLogNotice(message.getAddress());
+            ofLogNotice(ofToString(message.getArgAsInt(0)));
+            channel = message.getArgAsInt(0);
+        }
+        else if (message.getAddress() == "/midi/value/")
+        {
+            ofLogNotice(message.getAddress());
+            ofLogNotice(ofToString(message.getArgAsInt(0)));
+            value = message.getArgAsInt(0);
+        }
+        // midiParams[channel] = value;
+
+        if(channel == 0) // upper
+        {
+            Scanner::upperRidgeLimit = int(value * IMAGE_HEIGHT / 128);
+        }
+        else if(channel == 1) // center
+        {
+            Scanner::oscillationCenter = int(value * IMAGE_HEIGHT / 128);
+        }
+        else if(channel == 1) // lower
+        {
+            Scanner::lowerRidgeLimit = int(value * IMAGE_HEIGHT / 128);
+        }
+
+        ofLogNotice(ofToString(message.getAddress()));
+        ofLogNotice(ofToString(message));
+    }
+
     // --------- load next image upon request: ------------------------
     if (Controls::doLoadNextImage)
     {
